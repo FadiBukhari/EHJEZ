@@ -1,0 +1,52 @@
+.signup-container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid white;
+  background-color: white;
+  box-shadow: 0px 4px 12px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  width: 350px;
+  height: 500px;
+  align-items: center;
+  margin: 7vh auto;
+}
+.signup-form {
+  display: flex;
+  flex-direction: column;
+}
+.logo {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+.password {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.input-form {g
+  border-radius: 10px;
+  width: 260px;
+  height: 28px;
+  border: 1px solid #000000;
+  background-color: #ecf0f6;
+  margin-bottom: 10px;
+}
+.forgot-password {
+  cursor: pointer;
+  font-size: 11px;
+}
+.remember-me-container {
+  display: flex;
+  flex-direction: row;
+  margin-top: 15px;
+  border-bottom: 1px solid #00000067;
+  padding-bottom: 15px;
+  gap: 5px;
+}
+
+.last {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: -3;
+}
