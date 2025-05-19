@@ -1,0 +1,21 @@
+.room-card {
+  width: 200px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #4c4cdc81;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  gap: 10px;
+}
+.room-card-details {
+  display: flex;
+  flex-direction: column;
+}
+.room-card-img {
+  width: 160px;
+  height: 160px;
+  border-radius: 10px;
+}

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import "./CSS/NavBar.scss";
+import "./NavBar.scss";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -18,15 +18,11 @@ const NavBar = () => {
         onClick={handleHome}
       />
       <div className="navbar-links">
+        <Link className="link">Contact us</Link>
+        <Link to="/booking" className="link selected">
+          Booking
+        </Link>
         <button onClick={handleSignip}>SignUp</button>
-        {/**
-         
-         <Link>Home</Link>
-         <Link>Contact us</Link>
-         <Link>Booking</Link>
-         
-         
-         */}
       </div>
     </div>
   );

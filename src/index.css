@@ -16,6 +16,7 @@ body {
   animation: fadeIn 0.5s ease-in-out;
 }
 button {
+  text-align: center;
   cursor: pointer;
   border: 1px solid #4c4ddc;
   padding: 10px 20px;

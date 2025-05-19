@@ -9,12 +9,21 @@
 }
 .navbar-links {
   display: flex;
-  gap: 20px;
+  gap: 50px;
   list-style: none;
+  align-items: center;
 }
-.navbar-links * {
+.link {
   text-decoration: none;
   outline: none;
+  font-weight: 500;
+}
+.link:visited {
+  color: inherit;
+}
+.link.selected {
+  color: #4c4ddc;
+  border-bottom: solid 2px #4c4ddc;
 }
 .nav-logo {
   cursor: pointer;

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./CSS/SignUp.scss";
+import "./SignUp.scss";
 const SignUp = () => {
   const navigate = useNavigate();
   const handleSignin = () => {
