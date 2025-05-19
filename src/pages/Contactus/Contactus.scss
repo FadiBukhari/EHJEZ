@@ -1,0 +1,42 @@
+.contactus-page {
+  display: flex;
+  flex-direction: column;
+  margin: 70px auto;
+  align-items: center;
+  border: 1px solid #424141;
+  width: 550px;
+  padding: 50px;
+  gap: 50px;
+  border-radius: 50px;
+}
+.contactus-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+.contactus-page-description {
+  color: #1d1dff81;
+  font-weight: 500;
+}
+.contactus-form {
+  display: flex;
+  flex-direction: column;
+  width: inherit;
+}
+.contactus-form-input {
+  background-color: #e4e4fa;
+  border: none;
+  border-radius: 10px;
+  height: 30px;
+  margin-bottom: 50px;
+}
+.contactus-form-textarea {
+  background-color: #e4e4fa;
+  border: none;
+  border-radius: 10px;
+
+  height: 200px;
+}
+.contactus-form-button {
+  margin-top: 25px;
+  width: 150px;
+}

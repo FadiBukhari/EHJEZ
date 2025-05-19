@@ -32,12 +32,18 @@ const Booking = () => {
       <div className="booking-container">
         <RoomCard room={room1} />
         <RoomCard room={room1} />
-        <RoomCard room={room1} /> <RoomCard room={room1} />{" "}
-        <RoomCard room={room1} /> <RoomCard room={room1} />{" "}
-        <RoomCard room={room1} /> <RoomCard room={room1} />{" "}
-        <RoomCard room={room1} /> <RoomCard room={room1} />{" "}
-        <RoomCard room={room1} /> <RoomCard room={room1} />{" "}
-        <RoomCard room={room1} /> <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
+        <RoomCard room={room1} />
       </div>
     </div>
   );

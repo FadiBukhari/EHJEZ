@@ -1,8 +1,9 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./NavBar.scss";
 
 const NavBar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const handleSignip = () => {
     navigate("/signin");
   };
@@ -18,8 +19,20 @@ const NavBar = () => {
         onClick={handleHome}
       />
       <div className="navbar-links">
-        <Link className="link">Contact us</Link>
-        <Link to="/booking" className="link selected">
+        <Link
+          to="/contactus"
+          className={`link ${
+            location.pathname === "/contactus" ? "selected" : ""
+          }`}
+        >
+          Contact us
+        </Link>
+        <Link
+          to="/booking"
+          className={`link ${
+            location.pathname === "/booking" ? "selected" : ""
+          }`}
+        >
           Booking
         </Link>
         <button onClick={handleSignip}>SignUp</button>
