@@ -8,6 +8,7 @@ import Layout from "./components/NavBar/Layout";
 import SignUp from "./pages/SignUp/SignUp";
 import Booking from "./pages/Booking/Booking";
 import Contactus from "./pages/Contactus/Contactus";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/contactus" element={<Contactus />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </Router>

@@ -11,7 +11,7 @@ const Contactus = () => {
         <label>Subject</label>
         <input type="text" className="contactus-form-input" />
         <label>Message</label>
-        <input type="text" className="contactus-form-textarea" />
+        <textarea type="text" className="contactus-form-textarea" />
         <button className="contactus-form-button">Send</button>
       </form>
     </div>

@@ -36,6 +36,10 @@ const NavBar = () => {
           Booking
         </Link>
         <button onClick={handleSignip}>SignUp</button>
+
+        <Link to="/profile">
+          <img src="profile.svg" width="50px"></img>
+        </Link>
       </div>
     </div>
   );
