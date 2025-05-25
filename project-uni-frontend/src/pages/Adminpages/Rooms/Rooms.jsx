@@ -33,6 +33,8 @@ function Rooms() {
               id={room.id}
               type={room.roomType}
               description={room.description}
+              price={room.basePrice}
+              capacity={room.capacity}
             />
           ))
         )}

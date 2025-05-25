@@ -1,13 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./RoomCard.scss";
-const RoomCard = ({ id, type, description }) => {
+const RoomCard = ({ id, type, description, price, capacity }) => {
+  const navigate = useNavigate();
+  const handleEdit = () => {
+    navigate(`/admins/rooms/edit/${id}`, {
+      state: { room: { id, type, description, price, capacity } },
+    });
+  };
   return (
     <div className="roomcard-admin">
       <img src="/profile.svg" />
       <div>{type}</div>
-      {/* <div>{Owner}</div> */}
       <div>{description}</div>
-      <Link to={`admins/rooms/edit/${id}`}>Edit</Link>
+      <button onClick={handleEdit}>Edit</button>
     </div>
   );
 };

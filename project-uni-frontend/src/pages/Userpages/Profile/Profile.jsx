@@ -52,7 +52,7 @@ const Profile = () => {
     }
 
     API.put("/users/editprofile", updatedData)
-      .then((res) => {
+      .then(() => {
         setProfileData((prevData) => ({
           ...prevData,
           ...updatedData,

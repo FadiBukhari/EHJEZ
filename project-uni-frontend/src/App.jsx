@@ -14,6 +14,7 @@ import AddRoom from "./pages/Adminpages/AddRoom/AddRoom";
 import BookRoom from "./pages/Userpages/BookRoom/BookRoom";
 import MyBookings from "./pages/Userpages/MyBookings/MyBookings";
 import Payment from "./pages/Userpages/Payment/Payment";
+import EditRoom from "./pages/Adminpages/EditRoom/EditRoom";
 
 function App() {
   return (
@@ -30,10 +31,10 @@ function App() {
             <Route path="/joinus" element={<JoinUs />} />
             <Route path="/book/:id" element={<BookRoom />} />
             <Route path="/payment/:id" element={<Payment />} />
-
             <Route path="/mybookings" element={<MyBookings />} />
             <Route path="/admin/rooms" element={<Rooms />} />
-            <Route path="/admin/rooms/new" element={<AddRoom />} />
+            <Route path="/admin/rooms/new" element={<AddRoom />} />{" "}
+            <Route path="/admins/rooms/edit/:id" element={<EditRoom />} />
           </Route>
         </Routes>
       </Router>

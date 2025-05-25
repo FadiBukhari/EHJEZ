@@ -12,7 +12,11 @@ Room.belongsTo(User, { as: "owner", foreignKey: "ownerId" });
 User.hasMany(Booking, { foreignKey: "customerId" });
 Booking.belongsTo(User, { as: "customer", foreignKey: "customerId" });
 
-Room.hasMany(Booking, { foreignKey: "roomId" });
+Room.hasMany(Booking, {
+  foreignKey: "roomId",
+  onDelete: "CASCADE",
+  hooks: true,
+});
 Booking.belongsTo(Room, { foreignKey: "roomId" });
 
 User.hasMany(Notification, { as: "sentNotifications", foreignKey: "senderId" });

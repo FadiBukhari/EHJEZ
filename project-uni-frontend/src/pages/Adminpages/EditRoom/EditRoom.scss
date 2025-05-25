@@ -1,0 +1,39 @@
+.edit-room-page {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 1200px;
+  height: 300px;
+  margin: 0 auto;
+  margin-top: 80px;
+  margin-bottom: 650px;
+}
+.form-group {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+.desc {
+  flex-direction: column;
+  gap: 0px;
+  margin-bottom: 20px;
+}
+.edit-room-form {
+  border: solid 1px #ccc;
+  padding: 20px;
+  border-radius: 10px;
+}
+.desc-input {
+  border: solid 1px #ccc;
+  height: 100px;
+  resize: none;
+  width: 500px;
+}
+.edit-room-header {
+  display: flex;
+  justify-content: space-between;
+}
+.last-buttons {
+  display: flex;
+  justify-content: space-between;
+}
