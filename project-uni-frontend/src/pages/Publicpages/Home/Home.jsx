@@ -5,7 +5,7 @@ const Home = () => {
     <div>
       <div className="home-section1">
         <div className="part-home">
-          <h1 className="part-home-title">Our clients</h1>
+          <h1 className="part-home-title">Top Booked</h1>
           <div className="clients-section">
             <div className="client client1-img"></div>
             <div className="client client2-img"></div>

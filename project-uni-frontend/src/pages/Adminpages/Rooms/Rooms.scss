@@ -1,0 +1,18 @@
+.adminrooms {
+  display: flex;
+  flex-direction: column;
+  width: 1000px;
+  margin: 0 auto;
+  margin-top: 80px;
+}
+.newroom {
+  display: flex;
+  align-items: center;
+  border-bottom: solid 1px black;
+  justify-content: space-between;
+}
+.rooms-table {
+  margin-top: 25px;
+
+  margin-bottom: 650px;
+}

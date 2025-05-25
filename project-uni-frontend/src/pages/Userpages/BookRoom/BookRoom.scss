@@ -1,0 +1,28 @@
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  width: 1000px;
+
+  margin: 0 auto;
+  margin-top: 80px;
+  margin-bottom: 650px;
+  border: solid 1px #000000;
+  padding: 20px;
+  border-radius: 10px;
+}
+.book-room-details {
+  display: flex;
+
+  align-items: center;
+  gap: 80px;
+  border-bottom: solid 1px #000000;
+  margin-bottom: 30px;
+}
+.input-book {
+  padding: 5px;
+}
+.booking-form-fields {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+}

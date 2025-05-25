@@ -38,3 +38,8 @@ button {
   background: #888; /* Keep thumb visible */
   border-radius: 4px;
 }
+input {
+  background-color: #e4e4fa;
+  border: none;
+  border-radius: 3px;
+}

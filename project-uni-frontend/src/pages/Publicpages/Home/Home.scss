@@ -14,7 +14,7 @@
   justify-content: center;
   align-items: center;
   height: 800px;
-  background-image: url("background1.png");
+  background-image: url("/background1.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
   margin-bottom: 250px;
@@ -44,19 +44,19 @@
   border-radius: 50%;
   background-position: center;
   overflow: hidden;
-  background-color: #202020;
+  background-color: #4b4b97;
   background-repeat: no-repeat;
 }
 .client1-img {
-  background-image: url("client1.png");
+  background-image: url("/client1.png");
   background-size: cover;
 }
 .client2-img {
-  background-image: url("client2.png");
+  background-image: url("/client2.png");
   background-size: 90%;
 }
 .client3-img {
-  background-image: url("client3.png");
+  background-image: url("/client3.png");
   background-size: 70%;
 }
 .part-home-title {
@@ -85,10 +85,10 @@
   border-radius: 50px;
 }
 .image1 {
-  background-image: url("small1.png");
+  background-image: url("/small1.png");
 }
 .image2 {
-  background-image: url("small2.png");
+  background-image: url("/small2.png");
 }
 .last-section {
   position: relative;
@@ -147,14 +147,14 @@
   background-position: center;
 }
 .simage1 {
-  background-image: url("facebook.png");
+  background-image: url("/facebook.png");
 }
 .simage2 {
-  background-image: url("X.png");
+  background-image: url("/X.png");
 }
 .simage3 {
-  background-image: url("instagram.png");
+  background-image: url("/instagram.png");
 }
 .simage4 {
-  background-image: url("linkedin.png");
+  background-image: url("/linkedin.png");
 }

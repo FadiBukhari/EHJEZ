@@ -1,14 +1,20 @@
-import RoomCard from "../../components/RoomCard/RoomCard";
+import { useEffect, useState } from "react";
+import RoomCard from "../../../components/RoomCard/RoomCard";
 import "./Booking.scss";
+import API from "../../../services/api";
 const Booking = () => {
-  const room1 = {
-    name: "Room 1",
-    price: 100,
-    img: "small1.png",
-    available: true,
-    capacity: 2,
-    type: "Deluxe",
-  };
+  const [rooms, setRooms] = useState([]);
+  useEffect(() => {
+    try {
+      API.get("/rooms/all").then((res) => {
+        console.log("Rooms fetched:", res.data);
+        setRooms(res.data);
+      });
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+    }
+  }, []);
+  console.log("Rooms state:", rooms);
   return (
     <div className="booking-page">
       <div className="search-container">
@@ -30,20 +36,11 @@ const Booking = () => {
         </div>
       </div>
       <div className="booking-container">
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
-        <RoomCard room={room1} />
+        {rooms.length > 0 ? (
+          rooms.map((room) => <RoomCard room={room} />)
+        ) : (
+          <div className="no-rooms">No rooms available</div>
+        )}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ const Profile = () => {
       <h1>Profile details</h1>
       <div className="profile-avatar">
         <div className="profile-avatar-detail">
-          <img src="profile.svg" width="100px" className="profile-image"></img>
+          <img src="/profile.svg" width="100px" className="profile-image"></img>
           <div className="profile-name">John Doe</div>
         </div>
         <div className="profile-avatar-edit">

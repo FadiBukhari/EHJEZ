@@ -1,23 +1,61 @@
 import { useNavigate } from "react-router-dom";
 import "./SignIn.scss";
+import useAuthStore from "../../../useStore";
+import { useState } from "react";
+import API from "../../../services/api.js";
+
 const SignIn = () => {
   const navigate = useNavigate();
   const handleSignip = () => {
     navigate("/signup");
   };
+  const [form, setForm] = useState({ email: "", password: "" });
+  const { login } = useAuthStore();
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await API.post("/users/login", form);
+      login(res.data.user, res.data.token);
+      localStorage.setItem("token", res.data.token);
+      console.log("Login successful", res.data);
+      console.log("Login successful", res.data.user.username);
+
+      navigate("/");
+    } catch (err) {
+      console.error("Login failed", err); // Error is shown via interceptor
+    }
+  };
   return (
     <>
       <div className="signin-container">
-        <img src="logo.png" width="80px" className="logo" />
-        <form className="signin-form">
+        <img src="/logo.png" width="80px" className="logo" />
+        <form className="signin-form" onSubmit={handleSubmit}>
           <label>Email</label>
-          <input type="text" className="input-form" />
+          <input
+            type="email"
+            className="input-form"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
 
           <div className="password">
             <label>Password</label>
             <p className="forgot-password">Forgot your password?</p>
           </div>
-          <input type="password" className="input-form" />
+          <input
+            type="password"
+            className="input-form"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
           <button type="submit">Sign In</button>
           <div className="remember-me-container">
             <input type="checkbox" />

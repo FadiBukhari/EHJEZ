@@ -1,0 +1,38 @@
+.join-us-container {
+  display: flex;
+  margin: 0 auto;
+  margin-top: 80px;
+  margin-bottom: 150px;
+  width: 500px;
+  height: 500px;
+  gap: 50px;
+  flex-direction: column;
+}
+.company-details-small {
+  display: flex;
+  flex-direction: column;
+}
+.company-details-big {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+.join-us-form {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+  margin-top: 20px;
+}
+.join-us-title {
+  font-size: 25px;
+  font-weight: bold;
+}
+.input-join {
+  height: 35px;
+}
+.input-join-big {
+  height: 35px;
+}
+.inbig {
+  width: 100%;
+}
