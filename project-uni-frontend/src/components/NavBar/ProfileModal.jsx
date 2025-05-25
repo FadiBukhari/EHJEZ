@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import "./ProfileModal.scss"; // We'll create this next
+import "./ProfileModal.scss";
 import useLogout from "../../hooks/useLogout";
 import useAuthStore from "../../useStore";
 import { Link } from "react-router-dom";
@@ -41,7 +41,12 @@ const ProfileModal = () => {
           </div>
 
           <div className="profile-modal-menu">
-            <Link className="modal-menu-item">My Profile</Link>
+            <Link to="/profile" className="modal-menu-item">
+              My Profile
+            </Link>
+            <Link to="/mybookings" className="modal-menu-item">
+              My Bookings
+            </Link>
             <button className="modal-menu-item" onClick={logout}>
               Logout
             </button>

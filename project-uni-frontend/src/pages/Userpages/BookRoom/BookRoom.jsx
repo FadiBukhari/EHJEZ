@@ -20,14 +20,15 @@ const BookRoom = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await API.post("/bookings", {
-        roomId,
+      await API.post("/bookings/", {
+        id: parseInt(roomId),
         date: selectedDate,
-        checkIn,
-        checkOut,
+        checkInTime: checkIn,
+        checkOutTime: checkOut,
+        totalPrice: room.basePrice,
       });
-      toast.success("Room booked successfully!");
-      navigate("/my-bookings");
+      toast.success("Booking in progress!");
+      navigate(`/payment/${roomId}`);
     } catch (err) {
       console.error(err);
       toast.error("Booking failed.");

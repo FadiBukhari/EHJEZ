@@ -6,7 +6,7 @@ import API from "../../../services/api.js";
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const handleSignip = () => {
+  const handleSignin = () => {
     navigate("/signup");
   };
   const [form, setForm] = useState({ email: "", password: "" });
@@ -78,7 +78,7 @@ const SignIn = () => {
                 "font-size": "18px",
                 cursor: "pointer",
               }}
-              onClick={handleSignip}
+              onClick={handleSignin}
             >
               Create your new account
             </p>

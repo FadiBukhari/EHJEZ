@@ -8,7 +8,7 @@ const RoomCard = ({ room }) => {
   return (
     <>
       <div className="room-card">
-        <img className="room-card-img" src="/profile.svg" />
+        <img className="room-card-img" src="/small1.png" />
         <div className="room-card-details">
           <span className="room-card-title">{`${room.roomType}`}</span>
           <span>Price:{`${room.basePrice}`}</span>

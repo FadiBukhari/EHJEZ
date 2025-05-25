@@ -1,10 +1,8 @@
-/* Profile container - positions the modal relative to this */
 .profile-container {
   position: relative;
   display: inline-block;
 }
 
-/* Profile image button styles */
 .profile-image-button {
   background: none;
   border: none;
@@ -54,7 +52,6 @@
   }
 }
 
-/* Modal header */
 .profile-modal-header {
   display: flex;
   align-items: center;
@@ -82,7 +79,6 @@
   color: #666;
 }
 
-/* Modal menu items */
 .profile-modal-menu {
   padding: 8px 0;
 }

@@ -24,7 +24,9 @@ API.interceptors.response.use(
     const status = error.response?.status;
     console.log("API Error:", error);
     console.log("Status Code:", status);
-    if (status === 401 || status === 403) {
+    if (status === 404) {
+      toast.error("Invalid Credentials. Please try again.");
+    } else if (status === 401 || status === 403) {
       toast.error("Session expired. Please login again.");
       localStorage.removeItem("token");
       authStore.logout(); // Clear Zustand state

@@ -1,6 +1,4 @@
 const { Notification } = require("../models");
-
-// POST /notifications   (authenticateToken + authorizeAdmin  — only admins send)
 exports.sendNotification = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
@@ -20,7 +18,6 @@ exports.sendNotification = async (req, res) => {
   }
 };
 
-// GET /notifications/my   (authenticateToken + authorizeUser)
 exports.getMyNotifications = async (req, res) => {
   try {
     const notifications = await Notification.findAll({

@@ -1,4 +1,3 @@
-// models/Room.js
 module.exports = (sequelize, DataTypes) => {
   const Room = sequelize.define(
     "Room",
@@ -16,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       basePrice: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
       description: DataTypes.TEXT,
-      /* ---- owner (admin/client) ---- */
+
       ownerId: {
         type: DataTypes.INTEGER,
         allowNull: false,

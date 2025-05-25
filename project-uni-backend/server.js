@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const { sequelize } = require("./models"); // Centralized import
+const { sequelize } = require("./models");
 const authenticateToken = require("./middlewares/authenticateToken.js");
 const userRoutes = require("./routes/userRoutes");
 const roomRoutes = require("./routes/roomRoutes");
@@ -10,7 +10,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 
 app.use(express.json());
-app.use(cors()); // Allow cross-origin requests
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

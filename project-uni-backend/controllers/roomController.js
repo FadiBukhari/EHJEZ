@@ -1,14 +1,11 @@
 const { Room } = require("../models");
 const { Op } = require("sequelize");
 
-// POST /rooms   (authenticateToken + authorizeAdmin)
 exports.createRoom = async (req, res) => {
   try {
-    const ownerId = req.user.userId; // admin ID
+    const ownerId = req.user.userId;
     const { roomNumber, roomType, capacity, status, basePrice, description } =
       req.body;
-
-    // Ensure unique roomNumber
     const exists = await Room.findOne({ where: { roomNumber } });
     if (exists)
       return res.status(400).json({ message: "Room number already exists" });
@@ -29,7 +26,6 @@ exports.createRoom = async (req, res) => {
   }
 };
 
-// PUT /rooms/:id   (authenticateToken + authorizeAdmin)
 exports.updateRoom = async (req, res) => {
   try {
     const room = await Room.findByPk(req.params.id);
@@ -45,8 +41,6 @@ exports.updateRoom = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-// DELETE /rooms/:id   (authenticateToken + authorizeAdmin)
 exports.deleteRoom = async (req, res) => {
   try {
     const room = await Room.findByPk(req.params.id);
@@ -63,7 +57,6 @@ exports.deleteRoom = async (req, res) => {
   }
 };
 
-// GET /rooms/owned   (authenticateToken + authorizeAdmin)
 exports.getOwnedRooms = async (req, res) => {
   try {
     const rooms = await Room.findAll({ where: { ownerId: req.user.userId } });
@@ -73,7 +66,6 @@ exports.getOwnedRooms = async (req, res) => {
   }
 };
 
-// GET /rooms/all   (authenticateToken)  — visible to any user
 exports.getAllRooms = async (req, res) => {
   try {
     const rooms = await Room.findAll({

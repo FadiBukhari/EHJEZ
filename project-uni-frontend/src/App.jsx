@@ -12,6 +12,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Rooms from "./pages/Adminpages/Rooms/Rooms";
 import AddRoom from "./pages/Adminpages/AddRoom/AddRoom";
 import BookRoom from "./pages/Userpages/BookRoom/BookRoom";
+import MyBookings from "./pages/Userpages/MyBookings/MyBookings";
+import Payment from "./pages/Userpages/Payment/Payment";
 
 function App() {
   return (
@@ -27,7 +29,9 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/joinus" element={<JoinUs />} />
             <Route path="/book/:id" element={<BookRoom />} />
+            <Route path="/payment/:id" element={<Payment />} />
 
+            <Route path="/mybookings" element={<MyBookings />} />
             <Route path="/admin/rooms" element={<Rooms />} />
             <Route path="/admin/rooms/new" element={<AddRoom />} />
           </Route>

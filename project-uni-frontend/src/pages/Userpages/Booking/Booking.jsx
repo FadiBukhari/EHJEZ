@@ -25,13 +25,8 @@ const Booking = () => {
         <div className="search-container-filters">
           <select>
             <option value="all">All</option>
-            <option value="deluxe">Deluxe</option>
-            <option value="standard">Standard</option>
-          </select>
-          <select>
-            <option value="all">All</option>
-            <option value="available">Available</option>
-            <option value="not-available">Not Available</option>
+            <option value="single">Single</option>
+            <option value="suite">Suite</option>
           </select>
         </div>
       </div>
