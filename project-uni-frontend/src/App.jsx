@@ -33,7 +33,7 @@ function App() {
             <Route path="/payment/:id" element={<Payment />} />
             <Route path="/mybookings" element={<MyBookings />} />
             <Route path="/admin/rooms" element={<Rooms />} />
-            <Route path="/admin/rooms/new" element={<AddRoom />} />{" "}
+            <Route path="/admin/rooms/new" element={<AddRoom />} />
             <Route path="/admins/rooms/edit/:id" element={<EditRoom />} />
           </Route>
         </Routes>
