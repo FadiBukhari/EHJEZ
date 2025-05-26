@@ -9,10 +9,19 @@ const RoomCard = ({ id, type, description, price, capacity }) => {
   };
   return (
     <div className="roomcard-admin">
-      <img src="/profile.svg" />
-      <div>{type}</div>
-      <div>{description}</div>
-      <button onClick={handleEdit}>Edit</button>
+      <img src="/small1.png" className="img-roomcard" />
+      <div className="room-card-details">
+        <div className="room-card-type">{type}</div>
+        <div className="room-card-description">
+          {description}asdfasdfasdfaasdgasdgasdgasd afhashfasfhadhfad
+          ahashasdgasdfasdf
+        </div>
+      </div>
+      <div>
+        <button onClick={handleEdit} className="roomcard-button">
+          Edit
+        </button>
+      </div>
     </div>
   );
 };

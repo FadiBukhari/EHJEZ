@@ -15,6 +15,7 @@ import BookRoom from "./pages/Userpages/BookRoom/BookRoom";
 import MyBookings from "./pages/Userpages/MyBookings/MyBookings";
 import Payment from "./pages/Userpages/Payment/Payment";
 import EditRoom from "./pages/Adminpages/EditRoom/EditRoom";
+import Bookings from "./pages/Adminpages/Bookings/Bookings";
 
 function App() {
   return (
@@ -34,7 +35,8 @@ function App() {
             <Route path="/mybookings" element={<MyBookings />} />
             <Route path="/admin/rooms" element={<Rooms />} />
             <Route path="/admin/rooms/new" element={<AddRoom />} />
-            <Route path="/admins/rooms/edit/:id" element={<EditRoom />} />
+            <Route path="/admins/rooms/edit/:id" element={<EditRoom />} />{" "}
+            <Route path="/admin/bookings" element={<Bookings />} />
           </Route>
         </Routes>
       </Router>

@@ -1,4 +1,4 @@
-const { Room } = require("../models");
+const { Room, Booking, User } = require("../models");
 const { Op } = require("sequelize");
 
 exports.createRoom = async (req, res) => {
@@ -74,6 +74,34 @@ exports.getAllRooms = async (req, res) => {
     });
     res.json(rooms);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+exports.getBookedRooms = async (req, res) => {
+  try {
+    const ownerId = req.user.userId;
+
+    const bookings = await Booking.findAll({
+      include: [
+        {
+          model: Room,
+          as: "room",
+          where: { ownerId },
+          attributes: ["id", "roomNumber", "roomType", "capacity"],
+        },
+        {
+          model: User,
+          as: "customer",
+          attributes: ["id", "username", "email", "phoneNumber"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json(bookings);
+  } catch (err) {
+    console.error("getBookedRooms error:", err);
+
     res.status(500).json({ error: err.message });
   }
 };

@@ -1,0 +1,55 @@
+.payment-page {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin-top: 50px;
+  justify-content: center;
+  margin-left: 150px;
+  margin-bottom: 650px;
+  width: 500px;
+}
+.payment-title {
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.payment-side-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.payment-room-details {
+  display: flex;
+  gap: 80px;
+  margin: 50px 0;
+}
+.payment-smaller-details {
+  display: flex;
+  flex-direction: column;
+}
+.payment-button {
+  background-color: white;
+  color: black;
+  border: solid rgba(0, 0, 0, 0.356) 1px;
+  border-radius: 15px;
+  margin-right: 20px;
+  margin-bottom: 30px;
+}
+.payment-form {
+  width: 400px;
+}
+.payment-card-input {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px;
+}
+.payment-labels-inner {
+  display: flex;
+  justify-content: space-between;
+}
+.payment-card-input > input {
+  /* Your input styles here */
+  padding: 8px;
+  border: 1px solid #cccccc8f;
+  border-radius: 4px;
+}

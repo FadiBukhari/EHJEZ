@@ -10,7 +10,6 @@ function Rooms() {
   useEffect(() => {
     API.get("/rooms/owned").then((res) => setRooms(res.data));
   }, []);
-  console.log("Rooms fetched:", rooms);
 
   return (
     <div className="adminrooms">

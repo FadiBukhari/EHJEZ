@@ -7,7 +7,6 @@ const NavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuthStore();
-  console.log("User in NavBar:", user);
   const handleSignip = () => {
     navigate("/signin");
   };
@@ -53,14 +52,24 @@ const NavBar = () => {
           </>
         )}
         {user?.role == "admin" && (
-          <Link
-            to="/admin/rooms"
-            className={`link ${
-              location.pathname === "/admin/rooms" ? "selected" : ""
-            }`}
-          >
-            Rooms
-          </Link>
+          <>
+            <Link
+              to="/admin/rooms"
+              className={`link ${
+                location.pathname === "/admin/rooms" ? "selected" : ""
+              }`}
+            >
+              Rooms
+            </Link>
+            <Link
+              to="/admin/bookings"
+              className={`link ${
+                location.pathname === "/admin/bookings" ? "selected" : ""
+              }`}
+            >
+              Bookings
+            </Link>
+          </>
         )}
         {!user?.username ? (
           <button onClick={handleSignip}>SignUp</button>

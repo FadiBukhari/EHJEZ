@@ -1,4 +1,4 @@
-.room-card {
+.room-card-user {
   width: 200px;
   height: 350px;
   display: flex;
@@ -10,11 +10,11 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   gap: 10px;
 }
-.room-card-details {
+.room-card-user-details {
   display: flex;
   flex-direction: column;
 }
-.room-card-img {
+.room-card-user-img {
   width: 160px;
   height: 160px;
   border-radius: 10px;

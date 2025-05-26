@@ -15,7 +15,6 @@ const BookRoom = () => {
   const [checkOut, setCheckOut] = useState("11:00");
   const { state } = useLocation();
   const room = state?.room || {};
-  console.log("Room details:", room);
   if (!room) navigate("/");
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +27,9 @@ const BookRoom = () => {
         totalPrice: room.basePrice,
       });
       toast.success("Booking in progress!");
-      navigate(`/payment/${roomId}`);
+      navigate(`/payment/${roomId}`, {
+        state: { room, selectedDate, checkIn, checkOut },
+      });
     } catch (err) {
       console.error(err);
       toast.error("Booking failed.");
@@ -39,12 +40,7 @@ const BookRoom = () => {
     <div className="booking-form">
       <h2>Book Room #{roomId}</h2>
       <div className="book-room-details">
-        <img
-          src="/profile.svg"
-          alt="Logoz"
-          width={300}
-          className="booking-logo"
-        />
+        <img src="/small1.png" alt="Logoz" className="booking-logo" />
         <p className="book-description">
           <strong>Room Type:</strong> {room.roomType || "Single"}
           <br />

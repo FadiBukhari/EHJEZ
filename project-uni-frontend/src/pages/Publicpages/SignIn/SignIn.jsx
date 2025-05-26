@@ -21,8 +21,6 @@ const SignIn = () => {
       const res = await API.post("/users/login", form);
       login(res.data.user, res.data.token);
       localStorage.setItem("token", res.data.token);
-      console.log("Login successful", res.data);
-      console.log("Login successful", res.data.user.username);
 
       navigate("/");
     } catch (err) {

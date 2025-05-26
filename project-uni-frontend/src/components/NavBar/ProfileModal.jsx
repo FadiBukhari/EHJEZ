@@ -44,9 +44,13 @@ const ProfileModal = () => {
             <Link to="/profile" className="modal-menu-item">
               My Profile
             </Link>
-            <Link to="/mybookings" className="modal-menu-item">
-              My Bookings
-            </Link>
+            {user?.role !== "admin" ? (
+              <Link to="/mybookings" className="modal-menu-item">
+                My Bookings
+              </Link>
+            ) : (
+              <></>
+            )}
             <button className="modal-menu-item" onClick={logout}>
               Logout
             </button>

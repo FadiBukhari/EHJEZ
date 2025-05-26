@@ -10,9 +10,20 @@
   align-items: center;
   border-bottom: solid 1px black;
   justify-content: space-between;
+  padding-bottom: 10px;
 }
 .rooms-table {
+  display: flex;
+  gap: 50px;
+  flex-wrap: wrap;
   margin-top: 25px;
 
   margin-bottom: 650px;
+}
+.newroom-title {
+  font-size: 30px;
+  font-weight: 500;
+}
+.newroom-button {
+  border-radius: 50px;
 }

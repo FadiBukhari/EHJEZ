@@ -6,7 +6,6 @@ const MyBookings = () => {
   useEffect(() => {
     try {
       API.get("/bookings/my").then((res) => {
-        console.log("My bookings fetched:", res.data);
         setRooms(res.data);
       });
     } catch (error) {
@@ -15,11 +14,12 @@ const MyBookings = () => {
   }, []);
   return (
     <div className="mybooking-container">
-      <h2>My Bookings</h2>
+      <h2 className="mybooking-title">My Bookings</h2>
       <div className="mybooking-content">
         {rooms.length > 0 ? (
           rooms.map((room) => (
             <div className="booking-card" key={room.id}>
+              <img src="/small1.png" width={300} className="booked-img-room" />
               <h3>Room #{room.id}</h3>
               <p>
                 <strong>Date:</strong>{" "}
@@ -39,8 +39,6 @@ const MyBookings = () => {
         ) : (
           <p>No bookings found.</p>
         )}
-
-        <img src="/profile.svg" alt="No bookings" width={300} />
       </div>
     </div>
   );

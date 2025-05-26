@@ -19,8 +19,7 @@ API.interceptors.response.use(
   (error) => {
     const authStore = useAuthStore.getState();
     const status = error.response?.status;
-    console.log("API Error:", error);
-    console.log("Status Code:", status);
+
     if (status === 404) {
       toast.error("Invalid Credentials. Please try again.");
     } else if (status === 401 || status === 403) {
