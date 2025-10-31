@@ -6,8 +6,37 @@ const { User } = require("../models");
 exports.addUser = async (req, res) => {
   try {
     const { username, password, email, phoneNumber, role } = req.body;
-    console.error(req.body);
-    const exists = await User?.findOne({
+
+    // Validate required fields
+    if (!username || !password || !email) {
+      return res
+        .status(400)
+        .json({ message: "Username, password, and email are required" });
+    }
+
+    // Validate password strength
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+
+    // Validate email format (basic check)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // SECURITY: Only allow 'user' role through public registration
+    // Admin and client accounts must be created by administrators
+    if (role && role !== "user") {
+      return res.status(403).json({
+        message:
+          "Only user accounts can be created through public registration. Contact an administrator to create client or admin accounts.",
+      });
+    }
+
+    const exists = await User.findOne({
       where: { [Op.or]: [{ email }, { username }] },
     });
     if (exists) {
@@ -15,13 +44,17 @@ exports.addUser = async (req, res) => {
         .status(400)
         .json({ message: "Email or username already in use" });
     }
+
     const hashed = await bcrypt.hash(password, 10);
+    // Force role to 'user' for all public registrations
     await User.create({
       username,
       password: hashed,
       email,
       phoneNumber,
-      role: role || "user",
+      role: "user",
+      openingHours: null,
+      closingHours: null,
     });
 
     res.status(201).json({ message: "User registered successfully" });
@@ -67,9 +100,11 @@ exports.getProfile = async (req, res) => {
 exports.editProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { username, email, phoneNumber } = req.body;
+    const { username, email, phoneNumber, openingHours, closingHours } =
+      req.body;
     const user = await User.findByPk(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
+
     const uniqueChecks = [];
     if (username) uniqueChecks.push({ username });
     if (email) uniqueChecks.push({ email });
@@ -88,14 +123,22 @@ exports.editProfile = async (req, res) => {
           .json({ message: "Username or email is already taken" });
       }
     }
+
     const updates = {};
     if (username) updates.username = username;
     if (email) updates.email = email;
     if (phoneNumber) updates.phoneNumber = phoneNumber;
 
+    // Allow clients to update operating hours
+    if (user.role === "client") {
+      if (openingHours !== undefined) updates.openingHours = openingHours;
+      if (closingHours !== undefined) updates.closingHours = closingHours;
+    }
+
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ message: "No valid fields to update" });
     }
+
     await user.update(updates);
     const { password, ...safeUser } = user.toJSON();
     res.json({ message: "Profile updated successfully", user: safeUser });

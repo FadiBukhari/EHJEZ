@@ -17,9 +17,19 @@ module.exports = (sequelize, DataTypes) => {
         validate: { len: [7, 20] },
       },
       role: {
-        type: DataTypes.ENUM("user", "admin"),
+        type: DataTypes.ENUM("user", "client", "admin"),
         defaultValue: "user",
         allowNull: false,
+      },
+      openingHours: {
+        type: DataTypes.TIME,
+        allowNull: true,
+        comment: "Store opening time (for clients only)",
+      },
+      closingHours: {
+        type: DataTypes.TIME,
+        allowNull: true,
+        comment: "Store closing time (for clients only)",
       },
     },
     { tableName: "Users" }

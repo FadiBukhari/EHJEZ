@@ -6,18 +6,29 @@ const {
   getOwnedRooms,
   getAllRooms,
   getBookedRooms,
+  getRoomBookings,
+  getRoomAvailability,
 } = require("../controllers/roomController");
 
 const authenticateToken = require("../middlewares/authenticateToken");
-const authorizeAdmin = require("../middlewares/authorizeAdmin");
+const authorizeClient = require("../middlewares/authorizeClient");
 
 const router = express.Router();
 
-router.post("/", authenticateToken, authorizeAdmin, createRoom);
-router.put("/:id", authenticateToken, authorizeAdmin, updateRoom);
-router.delete("/:id", authenticateToken, authorizeAdmin, deleteRoom);
-router.get("/owned", authenticateToken, authorizeAdmin, getOwnedRooms);
-router.get("/bookedowned", authenticateToken, authorizeAdmin, getBookedRooms);
+router.post("/", authenticateToken, authorizeClient, createRoom);
+router.put("/:id", authenticateToken, authorizeClient, updateRoom);
+router.delete("/:id", authenticateToken, authorizeClient, deleteRoom);
+router.get("/owned", authenticateToken, authorizeClient, getOwnedRooms);
+router.get("/bookedowned", authenticateToken, authorizeClient, getBookedRooms);
+router.get(
+  "/:id/bookings",
+  authenticateToken,
+  authorizeClient,
+  getRoomBookings
+);
+
+// Public endpoint for users to see room availability (requires auth but not client role)
+router.get("/:id/availability", authenticateToken, getRoomAvailability);
 
 router.get("/all", authenticateToken, getAllRooms);
 

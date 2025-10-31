@@ -3,11 +3,12 @@ const {
   createBooking,
   getUserBookings,
   updateBookingStatus,
+  deleteBooking,
 } = require("../controllers/bookingController");
 
 const authenticateToken = require("../middlewares/authenticateToken");
 const authorizeUser = require("../middlewares/authorizeUser");
-const authorizeAdmin = require("../middlewares/authorizeAdmin");
+const authorizeClient = require("../middlewares/authorizeClient");
 
 const router = express.Router();
 
@@ -16,8 +17,9 @@ router.get("/my", authenticateToken, authorizeUser, getUserBookings);
 router.put(
   "/:id/status",
   authenticateToken,
-  authorizeAdmin,
+  authorizeClient,
   updateBookingStatus
 );
+router.delete("/:id", authenticateToken, authorizeClient, deleteBooking);
 
 module.exports = router;

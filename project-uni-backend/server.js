@@ -8,6 +8,8 @@ const userRoutes = require("./routes/userRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const clientRoutes = require("./routes/clientRoutes");
 
 app.use(express.json());
 app.use(cors());
@@ -40,3 +42,5 @@ app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/bookings", bookingRoutes);
 app.use("/notifications", notificationRoutes);
+app.use("/admin", adminRoutes);
+app.use("/client", clientRoutes);

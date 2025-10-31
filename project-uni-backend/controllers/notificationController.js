@@ -1,11 +1,16 @@
 const { Notification } = require("../models");
+
 exports.sendNotification = async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Admins only" });
+    const { receiverId, message } = req.body;
+
+    // Validate required fields
+    if (!receiverId || !message) {
+      return res
+        .status(400)
+        .json({ message: "Receiver ID and message are required" });
     }
 
-    const { receiverId, message } = req.body;
     const notification = await Notification.create({
       senderId: req.user.userId,
       receiverId,
