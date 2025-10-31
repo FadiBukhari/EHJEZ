@@ -19,8 +19,7 @@ const SignIn = () => {
     e.preventDefault();
     try {
       const res = await API.post("/users/login", form);
-      login(res.data.user, res.data.token);
-      localStorage.setItem("token", res.data.token);
+      login(res.data.user);
 
       navigate("/");
     } catch (err) {
@@ -64,8 +63,8 @@ const SignIn = () => {
               style={{
                 textAlign: "center",
                 opacity: 0.5,
-                "margin-top": "15px",
-                "margin-bottom": "15px",
+                marginTop: "15px",
+                marginBottom: "15px",
               }}
             >
               Don't have an account yet?
@@ -73,7 +72,7 @@ const SignIn = () => {
             <p
               style={{
                 textAlign: "center",
-                "font-size": "18px",
+                fontSize: "18px",
                 cursor: "pointer",
               }}
               onClick={handleSignin}

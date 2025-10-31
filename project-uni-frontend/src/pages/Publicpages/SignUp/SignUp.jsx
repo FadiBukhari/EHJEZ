@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import "./SignUp.scss";
 import { useState } from "react";
 import API from "../../../services/api";
+import { toast } from "react-toastify";
+
 const SignUp = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -18,9 +20,14 @@ const SignUp = () => {
     e.preventDefault();
     try {
       if (form.password !== confirmPassword) {
-        return alert("Passwords do not match");
+        return toast.error("Passwords do not match");
       }
-      await API.post("users/register", form);
+      if (form.password.length < 6) {
+        return toast.error("Password must be at least 6 characters");
+      }
+      // All public registrations are users only
+      await API.post("users/register", { ...form, role: "user" });
+      toast.success("Registration successful! Please sign in.");
       navigate("/signin");
     } catch (err) {
       console.error("Register failed", err); // Shown via interceptor
@@ -74,13 +81,14 @@ const SignUp = () => {
           />
           <label>Phone Number</label>
           <input
-            type="phone"
+            type="tel"
             className="input-form"
             name="phoneNumber"
             value={form.phoneNumber}
             onChange={handleChange}
             required
           />
+
           <button type="submit">Create account</button>
 
           <div className="have-account">
@@ -88,8 +96,8 @@ const SignUp = () => {
               style={{
                 textAlign: "center",
                 opacity: 0.5,
-                "margin-top": "15px",
-                "margin-bottom": "15px",
+                marginTop: "15px",
+                marginBottom: "15px",
               }}
             >
               Already have an account?
@@ -97,7 +105,7 @@ const SignUp = () => {
             <p
               style={{
                 textAlign: "center",
-                "font-size": "18px",
+                fontSize: "18px",
                 cursor: "pointer",
               }}
               onClick={handleSignin}

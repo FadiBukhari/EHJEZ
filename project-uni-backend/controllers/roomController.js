@@ -149,7 +149,15 @@ exports.getAllRooms = async (req, res) => {
         {
           model: User,
           as: "owner",
-          attributes: ["id", "username", "openingHours", "closingHours"],
+          attributes: [
+            "id",
+            "username",
+            "openingHours",
+            "closingHours",
+            "latitude",
+            "longitude",
+            "address",
+          ],
         },
       ],
       order: [["basePrice", "ASC"]],

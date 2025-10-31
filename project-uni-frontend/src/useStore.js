@@ -1,17 +1,13 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
-const useAuthStore = create(
-  persist(
-    (set) => ({
-      user: null,
-      token: null,
-      login: (user, token) => set({ user, token }),
-      logout: () => set({ user: null, token: null }),
-      setUser: (user) => set((state) => ({ user: { ...state.user, ...user } })), // <- add this
-    }),
-    { name: "auth-storage" }
-  )
-);
+// No persistence - user data fetched from backend on each session
+const useAuthStore = create((set) => ({
+  user: null,
+  isLoading: true, // Track if we're checking authentication
+  login: (user) => set({ user, isLoading: false }),
+  logout: () => set({ user: null, isLoading: false }),
+  setUser: (user) => set((state) => ({ user: { ...state.user, ...user } })),
+  setLoading: (isLoading) => set({ isLoading }),
+}));
 
 export default useAuthStore;

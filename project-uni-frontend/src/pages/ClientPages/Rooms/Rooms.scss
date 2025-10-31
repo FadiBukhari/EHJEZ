@@ -1,0 +1,78 @@
+.adminrooms {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1400px;
+  margin: 80px auto 120px;
+  padding: 0 32px;
+}
+
+.newroom {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  background: linear-gradient(
+    135deg,
+    rgba(76, 77, 220, 0.05) 0%,
+    rgba(96, 97, 208, 0.05) 100%
+  );
+  justify-content: space-between;
+  padding: 24px 32px;
+  margin-bottom: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(76, 77, 220, 0.08);
+}
+
+.newroom-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #4c4ddc 0%, #6061d0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.newroom-button {
+  border-radius: 12px;
+  padding: 14px 28px;
+  height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #4c4ddc 0%, #6061d0 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 4px 16px rgba(76, 77, 220, 0.3);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(76, 77, 220, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.rooms-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 28px;
+  margin-top: 8px;
+}
+
+.no-rooms {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  font-size: 18px;
+  color: #95959f;
+  background: rgba(76, 77, 220, 0.03);
+  border-radius: 16px;
+  border: 2px dashed rgba(76, 77, 220, 0.2);
+}

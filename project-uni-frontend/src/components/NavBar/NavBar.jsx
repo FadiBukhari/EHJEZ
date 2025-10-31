@@ -26,14 +26,6 @@ const NavBar = () => {
         {user?.role == "user" && (
           <>
             <Link
-              to="/contactus"
-              className={`link ${
-                location.pathname === "/contactus" ? "selected" : ""
-              }`}
-            >
-              Contact us
-            </Link>
-            <Link
               to="/booking"
               className={`link ${
                 location.pathname === "/booking" ? "selected" : ""
@@ -42,32 +34,70 @@ const NavBar = () => {
               Booking
             </Link>
             <Link
-              to="/joinus"
+              to="/map"
               className={`link ${
-                location.pathname === "/joinus" ? "selected" : ""
+                location.pathname === "/map" ? "selected" : ""
               }`}
             >
-              Join Us
+              📍 Find Study Houses
+            </Link>
+          </>
+        )}
+        {user?.role == "client" && (
+          <>
+            <Link
+              to="/client/dashboard"
+              className={`link ${
+                location.pathname === "/client/dashboard" ? "selected" : ""
+              }`}
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/client/rooms"
+              className={`link ${
+                location.pathname === "/client/rooms" ? "selected" : ""
+              }`}
+            >
+              Rooms
+            </Link>
+            <Link
+              to="/client/bookings"
+              className={`link ${
+                location.pathname === "/client/bookings" ? "selected" : ""
+              }`}
+            >
+              Bookings
+            </Link>
+            <Link
+              to="/client/approve-bookings"
+              className={`link ${
+                location.pathname === "/client/approve-bookings"
+                  ? "selected"
+                  : ""
+              }`}
+            >
+              Approve Bookings
             </Link>
           </>
         )}
         {user?.role == "admin" && (
           <>
             <Link
-              to="/admin/rooms"
+              to="/admin/dashboard"
               className={`link ${
-                location.pathname === "/admin/rooms" ? "selected" : ""
+                location.pathname === "/admin/dashboard" ? "selected" : ""
               }`}
             >
-              Rooms
+              Dashboard
             </Link>
             <Link
-              to="/admin/bookings"
+              to="/admin/clients"
               className={`link ${
-                location.pathname === "/admin/bookings" ? "selected" : ""
+                location.pathname === "/admin/clients" ? "selected" : ""
               }`}
             >
-              Bookings
+              Clients
             </Link>
           </>
         )}

@@ -2,14 +2,22 @@ import { useEffect, useState } from "react";
 import "./Profile.scss";
 import API from "../../../services/api";
 import useAuthStore from "../../../useStore";
+import LocationPicker from "../../../components/LocationPicker/LocationPicker";
+
 const Profile = () => {
   const [profileData, setProfileData] = useState({});
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [username, setUsername] = useState("");
+  const [openingHours, setOpeningHours] = useState("");
+  const [closingHours, setClosingHours] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   const [isEmailEditable, setIsEmailEditable] = useState(false);
   const [isPhoneEditable, setIsPhoneEditable] = useState(false);
   const [isUsernameEditable, setIsUsernameEditable] = useState(false);
+  const [isHoursEditable, setIsHoursEditable] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const { user, setUser } = useAuthStore();
   useEffect(() => {
     API.get("/users/profile")
@@ -18,6 +26,10 @@ const Profile = () => {
         setEmail(res.data.email || "");
         setPhoneNumber(res.data.phoneNumber || "");
         setUsername(res.data.username || "");
+        setOpeningHours(res.data.openingHours || "");
+        setClosingHours(res.data.closingHours || "");
+        setLatitude(res.data.latitude || "");
+        setLongitude(res.data.longitude || "");
       })
       .catch((error) => {
         console.error("Error fetching profile:", error);
@@ -47,6 +59,17 @@ const Profile = () => {
         }
         updatedData.username = username;
         break;
+      case "hours":
+        if (
+          openingHours === profileData.openingHours &&
+          closingHours === profileData.closingHours
+        ) {
+          setIsHoursEditable(false);
+          return;
+        }
+        updatedData.openingHours = openingHours;
+        updatedData.closingHours = closingHours;
+        break;
       default:
         break;
     }
@@ -70,14 +93,38 @@ const Profile = () => {
           case "username":
             setIsUsernameEditable(false);
             break;
+          case "hours":
+            setIsHoursEditable(false);
+            break;
           default:
             break;
         }
       })
       .catch((error) => {
-        console.error(error);
+        console.error("Error updating profile:", error);
       });
   };
+
+  const handleLocationChange = (lat, lng) => {
+    const updatedData = {
+      latitude: lat,
+      longitude: lng,
+    };
+
+    API.put("/users/editprofile", updatedData)
+      .then(() => {
+        setProfileData((prevData) => ({
+          ...prevData,
+          ...updatedData,
+        }));
+        setLatitude(lat);
+        setLongitude(lng);
+      })
+      .catch((error) => {
+        console.error("Error updating location:", error);
+      });
+  };
+
   const handleEdit = (field) => {
     switch (field) {
       case "email":
@@ -89,10 +136,14 @@ const Profile = () => {
       case "username":
         setIsUsernameEditable(!isUsernameEditable);
         break;
+      case "hours":
+        setIsHoursEditable(true);
+        break;
       default:
         break;
     }
   };
+
   const handleCancel = (field) => {
     switch (field) {
       case "email":
@@ -107,11 +158,16 @@ const Profile = () => {
         setIsUsernameEditable(false);
         setUsername(profileData.username || "");
         break;
-
+      case "hours":
+        setIsHoursEditable(false);
+        setOpeningHours(profileData.openingHours || "");
+        setClosingHours(profileData.closingHours || "");
+        break;
       default:
         break;
     }
   };
+
   return (
     <div className="profile-page">
       <h1>Profile details</h1>
@@ -192,7 +248,7 @@ const Profile = () => {
           <div className="detail-container">
             <input
               className="detail"
-              type="phone"
+              type="tel"
               value={phoneNumber}
               onChange={(e) => {
                 setPhoneNumber(e.target.value);
@@ -216,7 +272,88 @@ const Profile = () => {
             )}
           </div>
         </div>
+
+        {user?.role === "client" && (
+          <>
+            <div className="profile-description-detail">
+              <label>Opening Hours</label>
+              <div className="detail-container">
+                <input
+                  className="detail"
+                  type="time"
+                  value={openingHours}
+                  onChange={(e) => {
+                    setOpeningHours(e.target.value);
+                  }}
+                  disabled={!isHoursEditable}
+                />
+              </div>
+            </div>
+
+            <div className="profile-description-detail">
+              <label>Closing Hours</label>
+              <div className="detail-container">
+                <input
+                  className="detail"
+                  type="time"
+                  value={closingHours}
+                  onChange={(e) => {
+                    setClosingHours(e.target.value);
+                  }}
+                  disabled={!isHoursEditable}
+                />
+                {isHoursEditable ? (
+                  <>
+                    <button onClick={() => handleSave("hours")}>Save</button>
+                    <button onClick={() => handleCancel("hours")}>
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => {
+                      handleEdit("hours");
+                    }}
+                  >
+                    Edit Hours
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="profile-description-detail">
+              <label>📍 Location</label>
+              <div className="detail-container">
+                {latitude && longitude ? (
+                  <div className="location-display">
+                    <span>
+                      Lat: {parseFloat(latitude).toFixed(6)}, Lng:{" "}
+                      {parseFloat(longitude).toFixed(6)}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="no-location">No location set</span>
+                )}
+                <button onClick={() => setShowLocationPicker(true)}>
+                  {latitude && longitude ? "Change Location" : "Set Location"}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
+
+      {showLocationPicker && (
+        <LocationPicker
+          initialLat={latitude ? parseFloat(latitude) : null}
+          initialLng={longitude ? parseFloat(longitude) : null}
+          onLocationChange={(lat, lng) => {
+            handleLocationChange(lat, lng);
+            setShowLocationPicker(false);
+          }}
+          onClose={() => setShowLocationPicker(false)}
+        />
+      )}
     </div>
   );
 };

@@ -1,8 +1,15 @@
 import { Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import NavBar from "./NavBar.jsx";
+import "./Footer.scss";
 
 const Layout = () => {
   const location = useLocation();
+
+  // Scroll to top whenever the route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <>
@@ -13,22 +20,9 @@ const Layout = () => {
       {location.pathname === "/signin" || location.pathname === "/signup" ? (
         <></>
       ) : (
-        <div class="last-section">
-          <div className="last-section-content">
-            <img src="/logo.png" width="100px" className="logo" />
-            <div className="toho">
-              <span>About us</span>
-              <span>Privacy policy</span>
-              <span>Terms of use</span>
-            </div>
-            <div className="social-media">
-              <div className="social simage1"></div>
-              <div className="social simage2"></div>
-              <div className="social simage3"></div>
-              <div className="social simage4"></div>
-            </div>
-          </div>
+        <footer className="footer-section">
           <svg
+            className="footer-wave"
             data-name="Layer 1"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1200 120"
@@ -39,7 +33,78 @@ const Layout = () => {
               className="shape-fill"
             ></path>
           </svg>
-        </div>
+          <div className="footer-content">
+            <div className="footer-column footer-brand">
+              <img src="/logo.png" alt="EHJEZ Logo" className="footer-logo" />
+              <p className="footer-description">
+                Your trusted platform for room booking and management.
+              </p>
+            </div>
+
+            <div className="footer-column">
+              <h3 className="footer-title">Company</h3>
+              <ul className="footer-links">
+                <li>
+                  <a href="#about">About Us</a>
+                </li>
+                <li>
+                  <a href="#privacy">Privacy Policy</a>
+                </li>
+                <li>
+                  <a href="#terms">Terms of Use</a>
+                </li>
+                <li>
+                  <a href="#contact">Contact</a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="footer-column">
+              <h3 className="footer-title">Quick Links</h3>
+              <ul className="footer-links">
+                <li>
+                  <a href="/booking">Browse Rooms</a>
+                </li>
+                <li>
+                  <a href="/joinus">Join Us</a>
+                </li>
+                <li>
+                  <a href="/contactus">Contact Us</a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="footer-column">
+              <h3 className="footer-title">Connect With Us</h3>
+              <div className="social-media">
+                <a
+                  href="#facebook"
+                  className="social simage1"
+                  aria-label="Facebook"
+                ></a>
+                <a
+                  href="#twitter"
+                  className="social simage2"
+                  aria-label="Twitter"
+                ></a>
+                <a
+                  href="#instagram"
+                  className="social simage3"
+                  aria-label="Instagram"
+                ></a>
+                <a
+                  href="#linkedin"
+                  className="social simage4"
+                  aria-label="LinkedIn"
+                ></a>
+              </div>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p>&copy; {new Date().getFullYear()} EHJEZ. All rights reserved.</p>
+          </div>
+        </footer>
       )}
     </>
   );

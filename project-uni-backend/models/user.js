@@ -31,6 +31,29 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         comment: "Store closing time (for clients only)",
       },
+      address: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: "Physical address (for clients only)",
+      },
+      latitude: {
+        type: DataTypes.DECIMAL(10, 8),
+        allowNull: true,
+        validate: {
+          min: -90,
+          max: 90,
+        },
+        comment: "Geographic latitude (for clients only)",
+      },
+      longitude: {
+        type: DataTypes.DECIMAL(11, 8),
+        allowNull: true,
+        validate: {
+          min: -180,
+          max: 180,
+        },
+        comment: "Geographic longitude (for clients only)",
+      },
     },
     { tableName: "Users" }
   );

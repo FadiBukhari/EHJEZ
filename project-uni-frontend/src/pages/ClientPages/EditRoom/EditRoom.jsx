@@ -2,49 +2,74 @@ import { useState } from "react";
 import "./EditRoom.scss";
 import API from "../../../services/api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+
 const EditRoom = () => {
   const { id } = useParams();
   const { state } = useLocation();
   const room = state?.room || {};
-  console.log("Room data:", state);
-  const [price, setPrice] = useState(room.price || "");
+  const [price, setPrice] = useState(room.basePrice || "");
   const [capacity, setCapacity] = useState(room.capacity || "");
   const [description, setDescription] = useState(room.description || "");
   const [roomType, setRoomType] = useState(room.roomType || "single");
   const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Validate inputs
+    if (!price || price <= 0) {
+      toast.error("Please enter a valid price");
+      return;
+    }
+    if (!capacity || capacity <= 0) {
+      toast.error("Please enter a valid capacity");
+      return;
+    }
+
     const roomData = {
       roomType,
-      basePrice: price,
-      capacity,
+      basePrice: parseFloat(price),
+      capacity: parseInt(capacity),
       description,
     };
     API.put(`/rooms/${id}`, roomData)
       .then((response) => {
         console.log("Room updated successfully:", response.data);
-        navigate("/admin/rooms");
+        toast.success("Room updated successfully");
+        navigate("/client/rooms");
       })
       .catch((error) => {
         console.error("Error updating room:", error);
       });
   };
   const handleRemove = () => {
+    if (!window.confirm("Are you sure you want to remove this room?")) {
+      return;
+    }
     API.delete(`/rooms/${id}`)
       .then((response) => {
         console.log("Room removed successfully:", response.data);
-        navigate("/admin/rooms");
+        toast.success("Room removed successfully");
+        navigate("/client/rooms");
       })
       .catch((error) => {
         console.error("Error removing room:", error);
       });
   };
   const handleCancel = () => {
-    navigate("/admin/rooms");
+    navigate("/client/rooms");
   };
   return (
     <div className="edit-room-page">
       <div className="edit-room-header">
+        <button
+          type="button"
+          className="back-button"
+          onClick={() => navigate("/client/rooms")}
+        >
+          ← Back
+        </button>
         <h1>Edit Room</h1>
         <button onClick={handleRemove}>Remove Room</button>
       </div>
@@ -69,6 +94,8 @@ const EditRoom = () => {
             type="number"
             id="price"
             name="price"
+            step="0.01"
+            min="0"
             required
             value={price}
             onChange={(e) => setPrice(e.target.value)}
@@ -77,8 +104,9 @@ const EditRoom = () => {
           <label>Capacity</label>
           <input
             type="number"
-            id="price"
-            name="price"
+            id="capacity"
+            name="capacity"
+            min="1"
             required
             value={capacity}
             onChange={(e) => setCapacity(e.target.value)}
@@ -97,14 +125,16 @@ const EditRoom = () => {
           />
         </div>
         <div className="last-buttons">
+          <button type="submit" className="submit-button">
+            Update Room
+          </button>
           <button
-            type="submit"
+            type="button"
             className="submit-button"
             onClick={handleCancel}
           >
-            Update Room
+            Cancel
           </button>
-          <button className="submit-button">Cancel</button>
         </div>
       </form>
     </div>

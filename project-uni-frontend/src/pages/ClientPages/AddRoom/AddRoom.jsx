@@ -1,4 +1,4 @@
-// pages/Admin/NewRoomPage.jsx
+// pages/Client/NewRoomPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../../services/api";
@@ -25,7 +25,7 @@ const AddRoom = () => {
         capacity: parseInt(room.capacity, 10),
         basePrice: parseFloat(room.basePrice),
       });
-      navigate("/admin/rooms");
+      navigate("/client/rooms");
     } catch (err) {
       console.error(err);
     }
@@ -33,7 +33,16 @@ const AddRoom = () => {
 
   return (
     <form onSubmit={handleSubmit} className="newroom-container">
-      <h2 className="text-xl font-bold">Add New Room</h2>
+      <div className="page-header-with-back">
+        <button
+          type="button"
+          className="back-button"
+          onClick={() => navigate("/client/rooms")}
+        >
+          ← Back
+        </button>
+        <h2 className="text-xl font-bold">Add New Room</h2>
+      </div>
       <input
         name="roomNumber"
         placeholder="Room Number"
@@ -58,6 +67,7 @@ const AddRoom = () => {
         name="capacity"
         type="number"
         placeholder="Capacity"
+        min="1"
         value={room.capacity}
         onChange={handleChange}
         required
@@ -68,6 +78,7 @@ const AddRoom = () => {
         name="basePrice"
         type="number"
         step="0.01"
+        min="0"
         placeholder="Base Price"
         value={room.basePrice}
         onChange={handleChange}

@@ -78,12 +78,62 @@ exports.loginUser = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
+    // Set JWT in HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true, // Cannot be accessed by JavaScript
+      secure: process.env.NODE_ENV === "production", // HTTPS only in production
+      sameSite: "strict", // CSRF protection
+      maxAge: 60 * 60 * 1000, // 1 hour
+    });
+
     const usersent = { username: user.username, role: user.role };
-    res.json({ user: usersent, token });
+    res.json({ user: usersent });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.logoutUser = async (req, res) => {
+  try {
+    // Clear the HTTP-only cookie
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 0, // Expire immediately
+    });
+
+    res.json({ message: "Logged out successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.verifyAuth = async (req, res) => {
+  try {
+    // Token already verified by authenticateToken middleware
+    // req.user contains the JWT payload (userId, role, email)
+    const user = await User.findByPk(req.user.userId, {
+      attributes: ["id", "username", "email", "role", "phoneNumber"],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      user: {
+        username: user.username,
+        role: user.role,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.userId, {
@@ -100,8 +150,16 @@ exports.getProfile = async (req, res) => {
 exports.editProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { username, email, phoneNumber, openingHours, closingHours } =
-      req.body;
+    const {
+      username,
+      email,
+      phoneNumber,
+      openingHours,
+      closingHours,
+      address,
+      latitude,
+      longitude,
+    } = req.body;
     const user = await User.findByPk(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -129,10 +187,13 @@ exports.editProfile = async (req, res) => {
     if (email) updates.email = email;
     if (phoneNumber) updates.phoneNumber = phoneNumber;
 
-    // Allow clients to update operating hours
+    // Allow clients to update operating hours and location
     if (user.role === "client") {
       if (openingHours !== undefined) updates.openingHours = openingHours;
       if (closingHours !== undefined) updates.closingHours = closingHours;
+      if (address !== undefined) updates.address = address;
+      if (latitude !== undefined) updates.latitude = latitude;
+      if (longitude !== undefined) updates.longitude = longitude;
     }
 
     if (Object.keys(updates).length === 0) {

@@ -2,6 +2,8 @@ const express = require("express");
 const {
   addUser,
   loginUser,
+  logoutUser,
+  verifyAuth,
   getProfile,
   editProfile,
 } = require("../controllers/userController");
@@ -11,6 +13,8 @@ const router = express.Router();
 
 router.post("/register", addUser);
 router.post("/login", loginUser);
+router.post("/logout", logoutUser);
+router.get("/verify", authenticateToken, verifyAuth);
 router.get("/profile", authenticateToken, getProfile);
 router.put("/editprofile", authenticateToken, editProfile);
 

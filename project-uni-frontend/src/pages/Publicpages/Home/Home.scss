@@ -1,160 +1,134 @@
 @keyframes appear {
   from {
     opacity: 0;
-    scale: 0.5;
+    transform: scale(0.9);
   }
   to {
     opacity: 1;
-    scale: 1;
+    transform: scale(1);
   }
 }
+
 .home-section1 {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 800px;
+  min-height: 800px;
   background-image: url("/background1.png");
-  background-size: 100% 100%;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
-  margin-bottom: 250px;
+  margin-bottom: 280px;
 }
+
 .part-home {
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: white;
-  border-radius: 50px;
+  border-radius: 32px;
   z-index: 10;
-  padding: 0px 50px 50px 50px;
-  gap: 30px;
+  padding: 48px 64px;
+  gap: 32px;
   top: 80%;
   border-bottom: 3px solid #afacac;
-  justify-content: center;
-  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
+
+.part-home-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+}
+
 .clients-section {
   display: flex;
-  gap: 150px;
+  gap: 120px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
+
 .client {
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   background-position: center;
+  background-repeat: no-repeat;
   overflow: hidden;
   background-color: #4b4b97;
-  background-repeat: no-repeat;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
 }
+
+.client:hover {
+  transform: scale(1.05);
+}
+
 .client1-img {
   background-image: url("/client1.png");
   background-size: cover;
 }
+
 .client2-img {
   background-image: url("/client2.png");
   background-size: 90%;
 }
+
 .client3-img {
   background-image: url("/client3.png");
   background-size: 70%;
-}
-.part-home-title {
 }
 
 .side-images-section {
   display: flex;
   flex-direction: column;
+  gap: 120px;
 }
+
 .mini-section1 {
   display: flex;
   justify-content: space-between;
-  padding: 0 20%;
+  padding: 0 10%;
   align-items: center;
-  margin-bottom: 150px;
+  gap: 64px;
+  margin-bottom: 120px;
 }
+
 .mini-paragraph {
-  width: 450px;
-  height: 150px;
+  max-width: 500px;
+  line-height: 1.8;
+  font-size: 16px;
+  color: #555;
 }
+
+.mini-paragraph h2 {
+  margin-bottom: 16px;
+  color: #333;
+  font-size: 28px;
+}
+
 .mini-image {
-  width: 400px;
-  height: 300px;
+  width: 450px;
+  height: 320px;
   background-repeat: no-repeat;
-  background-size: 100% 100%;
-  border-radius: 50px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 24px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
 }
+
+.mini-image:hover {
+  transform: translateY(-4px);
+}
+
 .image1 {
   background-image: url("/small1.png");
 }
+
 .image2 {
   background-image: url("/small2.png");
-}
-.last-section {
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  line-height: 0;
-  transform: rotate(180deg);
-
-  background-color: #ecf0f6;
-}
-
-.last-section svg {
-  position: relative;
-  display: block;
-  width: calc(100% + 1.3px);
-  height: 160px;
-  transform: rotateY(180deg);
-}
-
-.last-section .shape-fill {
-  fill: #c8c8f4;
-  fill-opacity: 1;
-}
-.last-section-content {
-  position: absolute;
-  display: flex;
-  gap: 90px;
-  transform: rotate(180deg);
-  z-index: 2;
-  top: 30%;
-  left: 20%;
-  display: flex;
-  align-items: center;
-}
-.toho {
-  display: flex;
-  gap: 40px;
-}
-.social-media {
-  display: flex;
-  gap: 50px;
-}
-.social {
-  cursor: pointer;
-  width: 50px;
-  height: 50px;
-  background-color: #4c4ddc;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-size: 40%;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-.simage1 {
-  background-image: url("/facebook.png");
-}
-.simage2 {
-  background-image: url("/X.png");
-}
-.simage3 {
-  background-image: url("/instagram.png");
-}
-.simage4 {
-  background-image: url("/linkedin.png");
 }

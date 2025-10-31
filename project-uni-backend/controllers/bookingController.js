@@ -46,6 +46,24 @@ exports.createBooking = async (req, res) => {
       return res.status(400).json({ message: "Room not available" });
     }
 
+    // Validate price calculation: hours × basePrice = totalPrice
+    const [inHour, inMin] = checkInTime.split(":").map(Number);
+    const [outHour, outMin] = checkOutTime.split(":").map(Number);
+    const totalMinutes = outHour * 60 + outMin - (inHour * 60 + inMin);
+    const calculatedHours = totalMinutes / 60;
+    const expectedPrice = calculatedHours * room.basePrice;
+
+    // Allow $0.01 tolerance for floating point rounding
+    if (Math.abs(totalPrice - expectedPrice) > 0.01) {
+      return res.status(400).json({
+        message: "Price calculation mismatch",
+        expected: parseFloat(expectedPrice.toFixed(2)),
+        received: totalPrice,
+        hours: calculatedHours,
+        basePrice: room.basePrice,
+      });
+    }
+
     // Validate booking time is within client's operating hours
     const owner = room.owner;
     if (owner.openingHours && owner.closingHours) {

@@ -1,55 +1,122 @@
 .payment-page {
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  margin-top: 50px;
-  justify-content: center;
-  margin-left: 150px;
-  margin-bottom: 650px;
-  width: 500px;
+  width: 100%;
+  max-width: 800px;
+  padding: 32px;
+  margin: 80px auto 120px;
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
 .payment-title {
-  font-size: 30px;
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 32px;
+  color: #333;
 }
+
 .payment-side-title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #333;
 }
+
 .payment-room-details {
   display: flex;
-  gap: 80px;
-  margin: 50px 0;
+  gap: 48px;
+  margin: 32px 0;
+  padding: 24px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
 }
+
+.payment-room-details img {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
 .payment-smaller-details {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  flex: 1;
 }
+
+.payment-smaller-details p {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.payment-smaller-details strong {
+  color: #333;
+  font-weight: 600;
+}
+
 .payment-button {
   background-color: white;
-  color: black;
-  border: solid rgba(0, 0, 0, 0.356) 1px;
-  border-radius: 15px;
-  margin-right: 20px;
-  margin-bottom: 30px;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px 24px;
+  margin-right: 12px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
 }
+
+.payment-button:hover {
+  background-color: #f5f5f5;
+  border-color: #4c4ddc;
+}
+
 .payment-form {
-  width: 400px;
+  width: 100%;
 }
+
 .payment-card-input {
   display: flex;
   flex-direction: column;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
+
+.payment-card-input label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.payment-card-input input {
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.payment-card-input input:focus {
+  outline: none;
+  border-color: #4c4ddc;
+  background-color: white;
+}
+
 .payment-labels-inner {
   display: flex;
+  gap: 16px;
   justify-content: space-between;
 }
-.payment-card-input > input {
-  /* Your input styles here */
-  padding: 8px;
-  border: 1px solid #cccccc8f;
-  border-radius: 4px;
+
+.payment-form button[type="submit"] {
+  width: 100%;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 24px;
 }

@@ -1,0 +1,251 @@
+.location-picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.location-picker-container {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  gap: 0;
+  margin: auto;
+
+  .location-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 2px solid #e4e4fa;
+    background: linear-gradient(135deg, #4c4ddc 0%, #6061d0 100%);
+    color: white;
+
+    h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .close-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .location-picker-instructions {
+    padding: 16px 24px;
+    background: #f8f8ff;
+    border-bottom: 1px solid #e4e4fa;
+
+    p {
+      margin: 0 0 12px 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .current-location-btn {
+      padding: 10px 16px;
+      background: white;
+      border: 2px solid #4c4ddc;
+      color: #4c4ddc;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+
+      &:hover:not(:disabled) {
+        background: #4c4ddc;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(76, 77, 220, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .location-picker-map {
+    flex: 1 1 auto;
+    min-height: 300px;
+    max-height: 500px;
+    height: 50vh;
+    position: relative;
+    width: 100%;
+
+    .leaflet-container {
+      cursor: crosshair;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .location-picker-coordinates {
+    padding: 16px 24px;
+    background: #f8f8ff;
+    border-top: 1px solid #e4e4fa;
+    display: flex;
+    gap: 24px;
+
+    .coordinate-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .label {
+        font-size: 13px;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .value {
+        font-size: 14px;
+        color: #101010;
+        font-weight: 600;
+        font-family: monospace;
+        background: white;
+        padding: 4px 12px;
+        border-radius: 6px;
+        border: 1px solid #e4e4fa;
+      }
+    }
+  }
+
+  .location-picker-actions {
+    padding: 20px 24px;
+    background: white;
+    border-top: 2px solid #e4e4fa;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+
+    button {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+
+      &.cancel-btn {
+        background: #f5f5f5;
+        color: #666;
+
+        &:hover {
+          background: #e0e0e0;
+        }
+      }
+
+      &.save-btn {
+        background: linear-gradient(135deg, #4c4ddc 0%, #6061d0 100%);
+        color: white;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(76, 77, 220, 0.4);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .location-picker-overlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .location-picker-container {
+    max-height: 95vh;
+
+    .location-picker-header {
+      padding: 16px;
+
+      h3 {
+        font-size: 18px;
+      }
+    }
+
+    .location-picker-instructions {
+      padding: 12px 16px;
+
+      .current-location-btn {
+        width: 100%;
+      }
+    }
+
+    .location-picker-map {
+      min-height: 250px;
+      max-height: 400px;
+      height: 40vh;
+    }
+
+    .location-picker-coordinates {
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .location-picker-actions {
+      padding: 16px;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// Large screens (TV/Desktop)
+@media (min-width: 1400px) {
+  .location-picker-container {
+    max-width: 1000px;
+    max-height: 85vh;
+
+    .location-picker-map {
+      max-height: 600px;
+      height: 55vh;
+    }
+  }
+}

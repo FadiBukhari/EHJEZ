@@ -1,0 +1,284 @@
+.clients-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .clients-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    font-size: 1.2rem;
+    color: #666;
+  }
+
+  .clients-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 24px 32px;
+    background: linear-gradient(
+      135deg,
+      rgba(76, 77, 220, 0.08) 0%,
+      rgba(96, 97, 208, 0.08) 100%
+    );
+    border-radius: 16px;
+    border: 1px solid rgba(76, 77, 220, 0.15);
+    box-shadow: 0 4px 16px rgba(76, 77, 220, 0.08);
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #4c4ddc 0%, #6061d0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+
+    .add-client-btn {
+      padding: 0.875rem 1.75rem;
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .clients-controls {
+    background: white;
+    padding: 1.75rem;
+    border-radius: 16px;
+    border: 1px solid rgba(76, 77, 220, 0.12);
+    box-shadow: 0 8px 24px rgba(76, 77, 220, 0.12);
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    .search-input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 2px solid rgba(76, 77, 220, 0.15);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        border-color: rgba(76, 77, 220, 0.4);
+        box-shadow: 0 2px 8px rgba(76, 77, 220, 0.1);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: #4c4ddc;
+        box-shadow: 0 0 0 4px rgba(76, 77, 220, 0.12);
+      }
+    }
+
+    .clients-count {
+      color: #4c4ddc;
+      font-size: 0.95rem;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 10px 20px;
+      background: linear-gradient(
+        135deg,
+        rgba(76, 77, 220, 0.1) 0%,
+        rgba(96, 97, 208, 0.1) 100%
+      );
+      border-radius: 24px;
+    }
+  }
+
+  .no-clients {
+    background: white;
+    padding: 4rem 3rem;
+    border-radius: 16px;
+    border: 2px dashed rgba(76, 77, 220, 0.3);
+    box-shadow: 0 8px 24px rgba(76, 77, 220, 0.08);
+    text-align: center;
+    background: linear-gradient(
+      135deg,
+      rgba(76, 77, 220, 0.03) 0%,
+      rgba(96, 97, 208, 0.03) 100%
+    );
+
+    p {
+      color: rgba(76, 77, 220, 0.7);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .clients-table-wrapper {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid rgba(76, 77, 220, 0.12);
+    box-shadow: 0 8px 24px rgba(76, 77, 220, 0.12);
+    overflow: hidden;
+
+    .clients-table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        tr {
+          background: linear-gradient(
+            135deg,
+            rgba(76, 77, 220, 0.08) 0%,
+            rgba(96, 97, 208, 0.08) 100%
+          );
+          border-bottom: 2px solid rgba(76, 77, 220, 0.15);
+
+          th {
+            padding: 1.2rem 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: #4c4ddc;
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+
+            &.text-center {
+              text-align: center;
+            }
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          border-bottom: 1px solid rgba(76, 77, 220, 0.06);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+          &:hover {
+            background: rgba(76, 77, 220, 0.03);
+          }
+
+          td {
+            padding: 1rem;
+            color: #555;
+
+            &.client-name {
+              font-weight: 600;
+              color: #1a1a1a;
+            }
+
+            &.text-center {
+              text-align: center;
+            }
+
+            .action-buttons {
+              display: flex;
+              gap: 0.5rem;
+              justify-content: center;
+
+              button {
+                padding: 0.6rem;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                font-size: 1rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+                &.btn-edit {
+                  background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+                  color: #856404;
+
+                  &:hover {
+                    background: linear-gradient(
+                      135deg,
+                      #f39c12 0%,
+                      #e67e22 100%
+                    );
+                    color: white;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 16px rgba(243, 156, 18, 0.4);
+                  }
+                }
+
+                &.btn-delete {
+                  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+                  color: #721c24;
+
+                  &:hover {
+                    background: linear-gradient(
+                      135deg,
+                      #e74c3c 0%,
+                      #c0392b 100%
+                    );
+                    color: white;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 16px rgba(231, 76, 60, 0.4);
+                  }
+                }
+
+                &:active {
+                  transform: translateY(0);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .clients-page {
+    padding: 1rem;
+
+    .clients-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .add-client-btn {
+        width: 100%;
+      }
+    }
+
+    .clients-controls {
+      flex-direction: column;
+
+      .clients-count {
+        text-align: center;
+      }
+    }
+
+    .clients-table-wrapper {
+      .clients-table {
+        font-size: 0.85rem;
+
+        th,
+        td {
+          padding: 0.5rem;
+        }
+      }
+    }
+  }
+}

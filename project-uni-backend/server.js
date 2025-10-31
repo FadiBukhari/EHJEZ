@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const { sequelize } = require("./models");
 const authenticateToken = require("./middlewares/authenticateToken.js");
 const userRoutes = require("./routes/userRoutes");
@@ -12,7 +13,13 @@ const adminRoutes = require("./routes/adminRoutes");
 const clientRoutes = require("./routes/clientRoutes");
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Frontend URL
+    credentials: true, // Allow cookies to be sent
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
