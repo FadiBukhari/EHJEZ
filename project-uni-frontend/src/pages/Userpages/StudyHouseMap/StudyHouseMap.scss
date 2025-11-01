@@ -202,6 +202,13 @@
           }
         }
 
+        .address {
+          color: #666;
+          font-size: 14px;
+          margin: 8px 0;
+          line-height: 1.5;
+        }
+
         .card-info {
           display: flex;
           gap: 20px;
@@ -263,6 +270,14 @@
       width: 100%;
       height: 100%;
       z-index: 1;
+
+      &.manual-mode {
+        cursor: crosshair !important;
+
+        * {
+          cursor: crosshair !important;
+        }
+      }
     }
 
     .location-prompt {
@@ -271,15 +286,89 @@
       left: 50%;
       transform: translateX(-50%);
       background: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
       z-index: 1000;
       font-size: 14px;
       color: #666;
+      text-align: center;
+      max-width: 400px;
+
+      &.error {
+        background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+        border: 2px solid #ffc9c9;
+
+        p {
+          color: #e74c3c;
+          font-weight: 500;
+        }
+      }
 
       p {
-        margin: 0;
+        margin: 0 0 12px 0;
+      }
+
+      .manual-location-btn {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #4c4ddc 0%, #6061d0 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(76, 77, 220, 0.3);
+        width: 100%;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(76, 77, 220, 0.4);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        &.secondary {
+          background: white;
+          color: #4c4ddc;
+          border: 2px solid #4c4ddc;
+          box-shadow: none;
+
+          &:hover {
+            background: #f8f8ff;
+          }
+        }
+      }
+    }
+
+    .reset-location-btn {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      padding: 12px 20px;
+      background: white;
+      color: #4c4ddc;
+      border: 2px solid #4c4ddc;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background: #4c4ddc;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(76, 77, 220, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
       }
     }
   }

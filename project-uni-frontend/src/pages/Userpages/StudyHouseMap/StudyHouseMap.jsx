@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./StudyHouseMap.scss";
@@ -47,6 +54,18 @@ function MapRecenter({ center }) {
   return null;
 }
 
+// Component to handle manual location selection
+function ManualLocationPicker({ isActive, onLocationSelect }) {
+  useMapEvents({
+    click(e) {
+      if (isActive) {
+        onLocationSelect(e.latlng);
+      }
+    },
+  });
+  return null;
+}
+
 const StudyHouseMap = () => {
   const navigate = useNavigate();
   const [userLocation, setUserLocation] = useState(null);
@@ -58,6 +77,8 @@ const StudyHouseMap = () => {
   const [radiusFilter, setRadiusFilter] = useState(100); // km
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedHouse, setSelectedHouse] = useState(null);
+  const [manualLocationMode, setManualLocationMode] = useState(false);
+  const [locationError, setLocationError] = useState(false);
 
   // Request user location on mount
   useEffect(() => {
@@ -68,10 +89,21 @@ const StudyHouseMap = () => {
         const location = await getUserLocation();
         if (isMounted) {
           setUserLocation(location);
+          setLocationError(false);
           // Keep map centered on Amman by default - don't auto-center on user
         }
       } catch (error) {
         console.error("Location error:", error);
+        if (isMounted) {
+          setLocationError(true);
+          toast.info(
+            "Click 'Set My Location' to manually mark your position on the map",
+            {
+              autoClose: 5000,
+              toastId: "location-error-info",
+            }
+          );
+        }
       }
     };
 
@@ -81,6 +113,30 @@ const StudyHouseMap = () => {
       isMounted = false;
     };
   }, []);
+
+  // Handle manual location selection
+  const handleManualLocationSelect = (latlng) => {
+    setUserLocation({ lat: latlng.lat, lng: latlng.lng });
+    setManualLocationMode(false);
+    setLocationError(false);
+    toast.success("Location set successfully! 📍", {
+      toastId: "location-success",
+    });
+  };
+
+  // Toggle manual location mode
+  const toggleManualLocationMode = () => {
+    setManualLocationMode((prev) => !prev);
+  };
+
+  // Show toast when manual location mode is activated
+  useEffect(() => {
+    if (manualLocationMode) {
+      toast.info("Click anywhere on the map to set your location", {
+        toastId: "manual-location-mode",
+      });
+    }
+  }, [manualLocationMode]);
 
   // Fetch study houses from API
   useEffect(() => {
@@ -316,7 +372,7 @@ const StudyHouseMap = () => {
         <MapContainer
           center={mapCenter}
           zoom={13}
-          className="leaflet-map"
+          className={`leaflet-map ${manualLocationMode ? "manual-mode" : ""}`}
           scrollWheelZoom={true}
         >
           <TileLayer
@@ -325,6 +381,10 @@ const StudyHouseMap = () => {
           />
 
           <MapRecenter center={mapCenter} />
+          <ManualLocationPicker
+            isActive={manualLocationMode}
+            onLocationSelect={handleManualLocationSelect}
+          />
 
           {/* User location marker */}
           {userLocation && (
@@ -379,10 +439,41 @@ const StudyHouseMap = () => {
           ))}
         </MapContainer>
 
-        {!userLocation && (
-          <div className="location-prompt">
-            <p>💡 Enable location to see distances and sort by proximity</p>
+        {/* Location controls */}
+        {!userLocation && locationError && (
+          <div className="location-prompt error">
+            <p>⚠️ Unable to detect your location automatically</p>
+            <button
+              className="manual-location-btn"
+              onClick={toggleManualLocationMode}
+            >
+              {manualLocationMode
+                ? "📍 Click on map to set location"
+                : "� Set My Location Manually"}
+            </button>
           </div>
+        )}
+
+        {!userLocation && !locationError && (
+          <div className="location-prompt">
+            <p>�💡 Enable location to see distances and sort by proximity</p>
+            <button
+              className="manual-location-btn secondary"
+              onClick={toggleManualLocationMode}
+            >
+              Set Location Manually
+            </button>
+          </div>
+        )}
+
+        {userLocation && (
+          <button
+            className="reset-location-btn"
+            onClick={toggleManualLocationMode}
+            title="Change your location"
+          >
+            {manualLocationMode ? "✖ Cancel" : "📍 Change My Location"}
+          </button>
         )}
       </div>
     </div>
