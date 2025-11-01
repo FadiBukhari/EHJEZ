@@ -53,8 +53,6 @@ const BookRoom = () => {
         // Backend returns { room, bookedSlots }
         const bookingsData = response.data.bookedSlots || [];
 
-        console.log("All booked slots:", bookingsData); // Debug
-
         // Filter bookings for the selected date
         // Use local date string to avoid timezone issues
         const year = selectedDate.getFullYear();
@@ -62,19 +60,15 @@ const BookRoom = () => {
         const day = String(selectedDate.getDate()).padStart(2, "0");
         const dateString = `${year}-${month}-${day}`;
 
-        console.log("Selected date string:", dateString); // Debug
-
         const dayBookings = bookingsData.filter((booking) => {
           // booking.date is already in "YYYY-MM-DD" format from backend
           const bookingDate = booking.date.split("T")[0]; // Handle both "YYYY-MM-DD" and "YYYY-MM-DDTHH:mm:ss"
-          console.log("Comparing:", bookingDate, "with", dateString); // Debug
           return (
             bookingDate === dateString &&
             (booking.status === "pending" || booking.status === "approved")
           );
         });
 
-        console.log("Bookings for selected date:", dayBookings); // Debug
         setBookedSlots(dayBookings);
       } catch (error) {
         console.error("Error fetching availability:", error);
@@ -103,11 +97,11 @@ const BookRoom = () => {
     };
   }, []);
 
-  // Generate available time slots based on owner's hours
+  // Generate available time slots based on client's hours
   useEffect(() => {
-    if (room.owner && room.owner.openingHours && room.owner.closingHours) {
-      const openTime = room.owner.openingHours; // e.g., "08:00:00"
-      const closeTime = room.owner.closingHours; // e.g., "22:00:00"
+    if (room.client && room.client.openingHours && room.client.closingHours) {
+      const openTime = room.client.openingHours; // e.g., "08:00:00"
+      const closeTime = room.client.closingHours; // e.g., "22:00:00"
 
       const openHour = parseInt(openTime.split(":")[0]);
       const closeHour = parseInt(closeTime.split(":")[0]);
@@ -132,10 +126,6 @@ const BookRoom = () => {
 
       // Check if current time falls within the booking range
       const isBooked = currentTime >= bookingStart && currentTime < bookingEnd;
-
-      if (isBooked) {
-        console.log(`Time ${time} is booked: ${bookingStart} - ${bookingEnd}`);
-      }
 
       return isBooked;
     });
@@ -209,8 +199,8 @@ const BookRoom = () => {
           <strong>Status:</strong> {room.status || "Available"}
           <br />
           <strong>Operating Hours:</strong>{" "}
-          {room.owner?.openingHours?.slice(0, 5) || "N/A"} -{" "}
-          {room.owner?.closingHours?.slice(0, 5) || "N/A"}
+          {room.client?.openingHours?.slice(0, 5) || "N/A"} -{" "}
+          {room.client?.closingHours?.slice(0, 5) || "N/A"}
         </p>
       </div>
 

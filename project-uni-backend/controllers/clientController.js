@@ -1,18 +1,27 @@
-const { Room, Booking, User } = require("../models");
+const { Room, Booking, User, Client } = require("../models");
 const { Op } = require("sequelize");
 
 // Get client-specific statistics
 exports.getClientStats = async (req, res) => {
   try {
-    const clientId = req.user.userId || req.user.id; // Get from authenticated user
+    const userId = req.user.userId || req.user.id; // Get from authenticated user
 
-    if (!clientId) {
-      return res.status(400).json({ message: "Client ID not found in token" });
+    if (!userId) {
+      return res.status(400).json({ message: "User ID not found in token" });
+    }
+
+    // Get the client profile
+    const client = await Client.findOne({
+      where: { userId },
+    });
+
+    if (!client) {
+      return res.status(404).json({ message: "Client profile not found" });
     }
 
     // Total rooms owned by this client
     const totalRooms = await Room.count({
-      where: { ownerId: clientId },
+      where: { clientId: client.id },
     });
 
     // Total bookings for this client's rooms
@@ -21,7 +30,7 @@ exports.getClientStats = async (req, res) => {
         {
           model: Room,
           as: "room",
-          where: { ownerId: clientId },
+          where: { clientId: client.id },
         },
       ],
     });
@@ -34,7 +43,7 @@ exports.getClientStats = async (req, res) => {
         {
           model: Room,
           as: "room",
-          where: { ownerId: clientId },
+          where: { clientId: client.id },
           attributes: ["roomNumber", "roomType"],
         },
         {

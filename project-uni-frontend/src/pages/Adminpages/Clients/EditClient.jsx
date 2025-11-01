@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../../services/api";
+import LocationPicker from "../../../components/LocationPicker/LocationPicker";
 import "./ClientForm.scss";
 
 const EditClient = () => {
@@ -12,10 +13,13 @@ const EditClient = () => {
     phoneNumber: "",
     openingHours: "",
     closingHours: "",
+    latitude: "",
+    longitude: "",
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
 
   useEffect(() => {
     const fetchClientDetails = async () => {
@@ -26,8 +30,10 @@ const EditClient = () => {
           username: client.username || "",
           email: client.email || "",
           phoneNumber: client.phoneNumber || "",
-          openingHours: client.openingHours || "",
-          closingHours: client.closingHours || "",
+          openingHours: client.clientProfile?.openingHours || "",
+          closingHours: client.clientProfile?.closingHours || "",
+          latitude: client.clientProfile?.latitude || "",
+          longitude: client.clientProfile?.longitude || "",
         });
         setLoading(false);
       } catch (error) {
@@ -49,6 +55,15 @@ const EditClient = () => {
     setError("");
   };
 
+  const handleLocationChange = (lat, lng) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+    }));
+    setShowLocationPicker(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -59,7 +74,9 @@ const EditClient = () => {
       !formData.email ||
       !formData.phoneNumber ||
       !formData.openingHours ||
-      !formData.closingHours
+      !formData.closingHours ||
+      !formData.latitude ||
+      !formData.longitude
     ) {
       setError("Please fill in all required fields");
       return;
@@ -93,6 +110,15 @@ const EditClient = () => {
 
   return (
     <div className="client-form-page">
+      {showLocationPicker && (
+        <LocationPicker
+          onLocationChange={handleLocationChange}
+          onClose={() => setShowLocationPicker(false)}
+          initialLat={formData.latitude || 0}
+          initialLng={formData.longitude || 0}
+        />
+      )}
+
       <div className="form-container">
         <div className="form-header">
           <h1>Edit Client</h1>
@@ -179,6 +205,48 @@ const EditClient = () => {
                 onChange={handleChange}
                 required
               />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>
+              📍 Location <span className="required">*</span>
+            </label>
+            {/* Hidden inputs for browser validation */}
+            <input
+              type="hidden"
+              name="latitude"
+              value={formData.latitude}
+              required
+            />
+            <input
+              type="hidden"
+              name="longitude"
+              value={formData.longitude}
+              required
+            />
+            <div className="location-display">
+              {formData.latitude && formData.longitude ? (
+                <div className="location-info">
+                  <span>
+                    Lat: {parseFloat(formData.latitude).toFixed(6)}, Lng:{" "}
+                    {parseFloat(formData.longitude).toFixed(6)}
+                  </span>
+                </div>
+              ) : (
+                <div className="location-info no-location">
+                  <span>No location selected</span>
+                </div>
+              )}
+              <button
+                type="button"
+                className="btn-select-location"
+                onClick={() => setShowLocationPicker(true)}
+              >
+                {formData.latitude && formData.longitude
+                  ? "Change Location"
+                  : "Select Location"}
+              </button>
             </div>
           </div>
 

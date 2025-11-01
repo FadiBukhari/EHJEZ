@@ -57,7 +57,6 @@ const Bookings = () => {
     }
   };
 
-  console.log(bookings);
   return (
     <>
       <div className="bookings-container">

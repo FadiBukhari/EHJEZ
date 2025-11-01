@@ -93,18 +93,17 @@ const StudyHouseMap = () => {
         const clientsMap = new Map();
 
         response.data.forEach((room) => {
-          if (room.owner && room.owner.latitude && room.owner.longitude) {
-            const clientId = room.owner.id;
+          if (room.client && room.client.latitude && room.client.longitude) {
+            const clientId = room.client.user?.id;
 
             if (!clientsMap.has(clientId)) {
               clientsMap.set(clientId, {
-                id: room.owner.id,
-                username: room.owner.username,
-                latitude: parseFloat(room.owner.latitude),
-                longitude: parseFloat(room.owner.longitude),
-                address: room.owner.address || "Address not provided",
-                openingHours: room.owner.openingHours,
-                closingHours: room.owner.closingHours,
+                id: clientId,
+                username: room.client.user?.username || "Study House",
+                latitude: parseFloat(room.client.latitude),
+                longitude: parseFloat(room.client.longitude),
+                openingHours: room.client.openingHours,
+                closingHours: room.client.closingHours,
                 roomCount: 1,
               });
             } else {
@@ -116,7 +115,6 @@ const StudyHouseMap = () => {
         });
 
         const houses = Array.from(clientsMap.values());
-        console.log("Study houses with location:", houses);
         setStudyHouses(houses);
         setFilteredHouses(houses);
         setLoading(false);
@@ -136,10 +134,8 @@ const StudyHouseMap = () => {
 
     // Search filter
     if (searchQuery) {
-      result = result.filter(
-        (house) =>
-          house.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          house.address.toLowerCase().includes(searchQuery.toLowerCase())
+      result = result.filter((house) =>
+        house.username.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -208,7 +204,7 @@ const StudyHouseMap = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search by name or address..."
+              placeholder="Search by study house name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
@@ -279,8 +275,6 @@ const StudyHouseMap = () => {
                       </span>
                     )}
                   </div>
-
-                  <p className="address">📍 {house.address}</p>
 
                   <div className="card-info">
                     {house.distance && (
@@ -360,7 +354,6 @@ const StudyHouseMap = () => {
               <Popup>
                 <div className="popup-content">
                   <h4>{house.username}</h4>
-                  <p>📍 {house.address}</p>
                   {house.distance && (
                     <p>📏 {formatDistance(house.distance)} away</p>
                   )}

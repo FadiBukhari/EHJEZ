@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../../services/api";
+import LocationPicker from "../../../components/LocationPicker/LocationPicker";
 import "./ClientForm.scss";
 
 const AddClient = () => {
@@ -12,9 +13,12 @@ const AddClient = () => {
     phoneNumber: "",
     openingHours: "",
     closingHours: "",
+    latitude: "",
+    longitude: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,6 +27,15 @@ const AddClient = () => {
       [name]: value,
     }));
     setError(""); // Clear error on input change
+  };
+
+  const handleLocationChange = (lat, lng) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+    }));
+    setShowLocationPicker(false);
   };
 
   const handleSubmit = async (e) => {
@@ -36,7 +49,9 @@ const AddClient = () => {
       !formData.password ||
       !formData.phoneNumber ||
       !formData.openingHours ||
-      !formData.closingHours
+      !formData.closingHours ||
+      !formData.latitude ||
+      !formData.longitude
     ) {
       setError("Please fill in all required fields");
       return;
@@ -55,18 +70,36 @@ const AddClient = () => {
     setLoading(true);
 
     try {
-      await API.post("/admin/clients", formData);
+      const payload = {
+        ...formData,
+        latitude: parseFloat(formData.latitude),
+        longitude: parseFloat(formData.longitude),
+      };
+      await API.post("/admin/clients", payload);
       alert("Client created successfully!");
       navigate("/admin/clients");
     } catch (error) {
       console.error("Error creating client:", error);
-      setError(error.response?.data?.message || "Failed to create client");
+      setError(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to create client"
+      );
       setLoading(false);
     }
   };
 
   return (
     <div className="client-form-page">
+      {showLocationPicker && (
+        <LocationPicker
+          onLocationChange={handleLocationChange}
+          onClose={() => setShowLocationPicker(false)}
+          initialLat={formData.latitude || 0}
+          initialLng={formData.longitude || 0}
+        />
+      )}
+
       <div className="form-container">
         <div className="form-header">
           <h1>Add New Client</h1>
@@ -169,6 +202,48 @@ const AddClient = () => {
                 onChange={handleChange}
                 required
               />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>
+              📍 Location <span className="required">*</span>
+            </label>
+            {/* Hidden inputs for browser validation */}
+            <input
+              type="hidden"
+              name="latitude"
+              value={formData.latitude}
+              required
+            />
+            <input
+              type="hidden"
+              name="longitude"
+              value={formData.longitude}
+              required
+            />
+            <div className="location-display">
+              {formData.latitude && formData.longitude ? (
+                <div className="location-info">
+                  <span>
+                    Lat: {parseFloat(formData.latitude).toFixed(6)}, Lng:{" "}
+                    {parseFloat(formData.longitude).toFixed(6)}
+                  </span>
+                </div>
+              ) : (
+                <div className="location-info no-location">
+                  <span>No location selected</span>
+                </div>
+              )}
+              <button
+                type="button"
+                className="btn-select-location"
+                onClick={() => setShowLocationPicker(true)}
+              >
+                {formData.latitude && formData.longitude
+                  ? "Change Location"
+                  : "Select Location"}
+              </button>
             </div>
           </div>
 

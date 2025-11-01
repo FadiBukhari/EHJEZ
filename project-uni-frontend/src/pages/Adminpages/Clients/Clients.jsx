@@ -107,8 +107,9 @@ const Clients = () => {
                   <td>{client.email}</td>
                   <td>{client.phoneNumber || "N/A"}</td>
                   <td>
-                    {client.openingHours && client.closingHours
-                      ? `${client.openingHours} - ${client.closingHours}`
+                    {client.clientProfile?.openingHours &&
+                    client.clientProfile?.closingHours
+                      ? `${client.clientProfile.openingHours} - ${client.clientProfile.closingHours}`
                       : "Not set"}
                   </td>
                   <td className="text-center">{client.roomCount || 0}</td>

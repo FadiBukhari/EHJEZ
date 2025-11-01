@@ -1,6 +1,7 @@
 const { Booking } = require("../models");
 const { Room } = require("../models");
 const { User } = require("../models");
+const { Client } = require("../models");
 const { Op } = require("sequelize");
 
 exports.createBooking = async (req, res) => {
@@ -35,8 +36,8 @@ exports.createBooking = async (req, res) => {
     const room = await Room.findByPk(id, {
       include: [
         {
-          model: User,
-          as: "owner",
+          model: Client,
+          as: "client",
           attributes: ["openingHours", "closingHours"],
         },
       ],
@@ -65,14 +66,14 @@ exports.createBooking = async (req, res) => {
     }
 
     // Validate booking time is within client's operating hours
-    const owner = room.owner;
-    if (owner.openingHours && owner.closingHours) {
+    const client = room.client;
+    if (client.openingHours && client.closingHours) {
       if (
-        checkInTime < owner.openingHours ||
-        checkOutTime > owner.closingHours
+        checkInTime < client.openingHours ||
+        checkOutTime > client.closingHours
       ) {
         return res.status(400).json({
-          message: `Booking times must be within operating hours: ${owner.openingHours} - ${owner.closingHours}`,
+          message: `Booking times must be within operating hours: ${client.openingHours} - ${client.closingHours}`,
         });
       }
     }

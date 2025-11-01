@@ -34,8 +34,7 @@ const EditRoom = () => {
       description,
     };
     API.put(`/rooms/${id}`, roomData)
-      .then((response) => {
-        console.log("Room updated successfully:", response.data);
+      .then(() => {
         toast.success("Room updated successfully");
         navigate("/client/rooms");
       })
@@ -48,8 +47,7 @@ const EditRoom = () => {
       return;
     }
     API.delete(`/rooms/${id}`)
-      .then((response) => {
-        console.log("Room removed successfully:", response.data);
+      .then(() => {
         toast.success("Room removed successfully");
         navigate("/client/rooms");
       })

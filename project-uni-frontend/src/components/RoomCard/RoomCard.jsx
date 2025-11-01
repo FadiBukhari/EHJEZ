@@ -25,7 +25,7 @@ const RoomCard = ({ room }) => {
         />
         <div className="room-card-user-details">
           <h3 className="room-card-title">
-            {room.owner?.username || "Study House"}
+            {room.client?.user?.username || "Study House"}
           </h3>
           <div className="room-info">
             <span className="info-label">Room Type:</span>
@@ -37,17 +37,11 @@ const RoomCard = ({ room }) => {
               {room.capacity} {room.capacity === 1 ? "Person" : "People"}
             </span>
           </div>
-          {room.owner?.address && (
-            <div className="room-info location">
-              <span className="info-label">📍</span>
-              <span className="info-value">{room.owner.address}</span>
-            </div>
-          )}
-          {room.owner?.openingHours && room.owner?.closingHours && (
+          {room.client?.openingHours && room.client?.closingHours && (
             <div className="room-info hours">
               <span className="info-label">🕐 Hours:</span>
               <span className="info-value">
-                {room.owner.openingHours} - {room.owner.closingHours}
+                {room.client.openingHours} - {room.client.closingHours}
               </span>
             </div>
           )}

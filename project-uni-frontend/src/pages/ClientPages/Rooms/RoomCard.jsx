@@ -73,7 +73,7 @@ const RoomCard = ({ id, type, description, price, capacity, onDelete }) => {
           {description && (
             <p className="room-card-description">{description}</p>
           )}
-          <div className="room-card-info-grid">
+          <div className="room-card-info-container">
             <div className="info-item">
               <span className="info-icon">💵</span>
               <div className="info-content">
@@ -81,6 +81,7 @@ const RoomCard = ({ id, type, description, price, capacity, onDelete }) => {
                 <span className="info-value">${price}/hour</span>
               </div>
             </div>
+            <div className="info-divider">•</div>
             <div className="info-item">
               <span className="info-icon">👥</span>
               <div className="info-content">

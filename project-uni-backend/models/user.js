@@ -16,43 +16,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         validate: { len: [7, 20] },
       },
-      role: {
-        type: DataTypes.ENUM("user", "client", "admin"),
-        defaultValue: "user",
+      roleId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-      },
-      openingHours: {
-        type: DataTypes.TIME,
-        allowNull: true,
-        comment: "Store opening time (for clients only)",
-      },
-      closingHours: {
-        type: DataTypes.TIME,
-        allowNull: true,
-        comment: "Store closing time (for clients only)",
-      },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        comment: "Physical address (for clients only)",
-      },
-      latitude: {
-        type: DataTypes.DECIMAL(10, 8),
-        allowNull: true,
-        validate: {
-          min: -90,
-          max: 90,
+        defaultValue: 1, // Default to 'user' role (id: 1)
+        references: {
+          model: "Roles",
+          key: "id",
         },
-        comment: "Geographic latitude (for clients only)",
-      },
-      longitude: {
-        type: DataTypes.DECIMAL(11, 8),
-        allowNull: true,
-        validate: {
-          min: -180,
-          max: 180,
-        },
-        comment: "Geographic longitude (for clients only)",
+        onUpdate: "CASCADE",
       },
     },
     { tableName: "Users" }

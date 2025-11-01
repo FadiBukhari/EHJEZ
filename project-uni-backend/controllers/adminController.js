@@ -1,18 +1,26 @@
 const bcrypt = require("bcrypt");
-const { User, Room, Booking } = require("../models");
+const { User, Room, Booking, Role, Client } = require("../models");
 const { Op } = require("sequelize");
 
 // Get all clients
 exports.getAllClients = async (req, res) => {
   try {
+    const clientRole = await Role.findOne({ where: { name: "client" } });
+
     const clients = await User.findAll({
-      where: { role: "client" },
+      where: { roleId: clientRole.id },
       attributes: { exclude: ["password"] },
       include: [
         {
-          model: Room,
-          as: "ownedRooms",
-          attributes: ["id"],
+          model: Client,
+          as: "clientProfile",
+          include: [
+            {
+              model: Room,
+              as: "rooms",
+              attributes: ["id"],
+            },
+          ],
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -21,8 +29,17 @@ exports.getAllClients = async (req, res) => {
     // Add room count and booking count
     const clientsWithStats = await Promise.all(
       clients.map(async (client) => {
+        const clientProfile = client.clientProfile;
+        if (!clientProfile) {
+          return {
+            ...client.toJSON(),
+            roomCount: 0,
+            bookingCount: 0,
+          };
+        }
+
         const roomCount = await Room.count({
-          where: { ownerId: client.id },
+          where: { clientId: clientProfile.id },
         });
 
         const bookingCount = await Booking.count({
@@ -30,7 +47,7 @@ exports.getAllClients = async (req, res) => {
             {
               model: Room,
               as: "room",
-              where: { ownerId: client.id },
+              where: { clientId: clientProfile.id },
             },
           ],
         });
@@ -54,19 +71,26 @@ exports.getAllClients = async (req, res) => {
 exports.getClientById = async (req, res) => {
   try {
     const { id } = req.params;
+    const clientRole = await Role.findOne({ where: { name: "client" } });
 
     const client = await User.findOne({
-      where: { id, role: "client" },
+      where: { id, roleId: clientRole.id },
       attributes: { exclude: ["password"] },
       include: [
         {
-          model: Room,
-          as: "ownedRooms",
+          model: Client,
+          as: "clientProfile",
+          include: [
+            {
+              model: Room,
+              as: "rooms",
+            },
+          ],
         },
       ],
     });
 
-    if (!client) {
+    if (!client || !client.clientProfile) {
       return res.status(404).json({ message: "Client not found" });
     }
 
@@ -75,7 +99,7 @@ exports.getClientById = async (req, res) => {
         {
           model: Room,
           as: "room",
-          where: { ownerId: client.id },
+          where: { clientId: client.clientProfile.id },
         },
       ],
     });
@@ -100,6 +124,8 @@ exports.createClient = async (req, res) => {
       phoneNumber,
       openingHours,
       closingHours,
+      latitude,
+      longitude,
     } = req.body;
 
     // Validate required fields
@@ -122,10 +148,16 @@ exports.createClient = async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    // Validate client operating hours
-    if (!openingHours || !closingHours) {
+    // Validate client operating hours and location
+    if (
+      !openingHours ||
+      !closingHours ||
+      latitude === undefined ||
+      longitude === undefined
+    ) {
       return res.status(400).json({
-        message: "Clients must provide opening and closing hours",
+        message:
+          "Clients must provide opening hours, closing hours, latitude, and longitude",
       });
     }
 
@@ -140,26 +172,39 @@ exports.createClient = async (req, res) => {
       });
     }
 
+    // Get client role
+    const clientRole = await Role.findOne({ where: { name: "client" } });
+
     // Hash password
     const hashed = await bcrypt.hash(password, 10);
 
-    // Create client
-    const client = await User.create({
+    // Create user with client role
+    const user = await User.create({
       username,
       password: hashed,
       email,
       phoneNumber,
-      role: "client",
+      roleId: clientRole.id,
+    });
+
+    // Create client profile
+    const clientProfile = await Client.create({
+      userId: user.id,
       openingHours,
       closingHours,
+      latitude,
+      longitude,
     });
 
     // Remove password from response
-    const { password: _, ...clientData } = client.toJSON();
+    const { password: _, ...userData } = user.toJSON();
 
     res.status(201).json({
       message: "Client created successfully",
-      client: clientData,
+      client: {
+        ...userData,
+        clientProfile,
+      },
     });
   } catch (err) {
     console.error("Create client error:", err);
@@ -171,15 +216,24 @@ exports.createClient = async (req, res) => {
 exports.updateClient = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, phoneNumber, openingHours, closingHours } =
-      req.body;
+    const {
+      username,
+      email,
+      phoneNumber,
+      openingHours,
+      closingHours,
+      latitude,
+      longitude,
+    } = req.body;
 
     // Find client
-    const client = await User.findOne({
-      where: { id, role: "client" },
+    const clientRole = await Role.findOne({ where: { name: "client" } });
+    const user = await User.findOne({
+      where: { id, roleId: clientRole.id },
+      include: [{ model: Client, as: "clientProfile" }],
     });
 
-    if (!client) {
+    if (!user || !user.clientProfile) {
       return res.status(404).json({ message: "Client not found" });
     }
 
@@ -203,27 +257,45 @@ exports.updateClient = async (req, res) => {
       }
     }
 
-    // Prepare updates
-    const updates = {};
-    if (username) updates.username = username;
-    if (email) updates.email = email;
-    if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
-    if (openingHours !== undefined) updates.openingHours = openingHours;
-    if (closingHours !== undefined) updates.closingHours = closingHours;
+    // Prepare user updates
+    const userUpdates = {};
+    if (username) userUpdates.username = username;
+    if (email) userUpdates.email = email;
+    if (phoneNumber !== undefined) userUpdates.phoneNumber = phoneNumber;
 
-    if (Object.keys(updates).length === 0) {
+    // Prepare client profile updates
+    const clientUpdates = {};
+    if (openingHours !== undefined) clientUpdates.openingHours = openingHours;
+    if (closingHours !== undefined) clientUpdates.closingHours = closingHours;
+    if (latitude !== undefined) clientUpdates.latitude = latitude;
+    if (longitude !== undefined) clientUpdates.longitude = longitude;
+
+    if (
+      Object.keys(userUpdates).length === 0 &&
+      Object.keys(clientUpdates).length === 0
+    ) {
       return res.status(400).json({ message: "No valid fields to update" });
     }
 
-    // Update client
-    await client.update(updates);
+    // Update user
+    if (Object.keys(userUpdates).length > 0) {
+      await user.update(userUpdates);
+    }
+
+    // Update client profile
+    if (Object.keys(clientUpdates).length > 0) {
+      await user.clientProfile.update(clientUpdates);
+    }
+
+    // Reload with updated data
+    await user.reload({ include: [{ model: Client, as: "clientProfile" }] });
 
     // Remove password from response
-    const { password: _, ...clientData } = client.toJSON();
+    const { password: _, ...userData } = user.toJSON();
 
     res.json({
       message: "Client updated successfully",
-      client: clientData,
+      client: userData,
     });
   } catch (err) {
     console.error("Update client error:", err);
@@ -237,11 +309,13 @@ exports.deleteClient = async (req, res) => {
     const { id } = req.params;
 
     // Find client
-    const client = await User.findOne({
-      where: { id, role: "client" },
+    const clientRole = await Role.findOne({ where: { name: "client" } });
+    const user = await User.findOne({
+      where: { id, roleId: clientRole.id },
+      include: [{ model: Client, as: "clientProfile" }],
     });
 
-    if (!client) {
+    if (!user || !user.clientProfile) {
       return res.status(404).json({ message: "Client not found" });
     }
 
@@ -254,7 +328,7 @@ exports.deleteClient = async (req, res) => {
         {
           model: Room,
           as: "room",
-          where: { ownerId: id },
+          where: { clientId: user.clientProfile.id },
         },
       ],
     });
@@ -265,8 +339,8 @@ exports.deleteClient = async (req, res) => {
       });
     }
 
-    // Delete client (cascade will delete rooms and bookings)
-    await client.destroy();
+    // Delete user (cascade will delete client profile, rooms, and bookings)
+    await user.destroy();
 
     res.json({
       message: "Client deleted successfully",
@@ -280,8 +354,11 @@ exports.deleteClient = async (req, res) => {
 // Get platform statistics
 exports.getPlatformStats = async (req, res) => {
   try {
-    const totalClients = await User.count({ where: { role: "client" } });
-    const totalUsers = await User.count({ where: { role: "user" } });
+    const clientRole = await Role.findOne({ where: { name: "client" } });
+    const userRole = await Role.findOne({ where: { name: "user" } });
+
+    const totalClients = await User.count({ where: { roleId: clientRole.id } });
+    const totalUsers = await User.count({ where: { roleId: userRole.id } });
     const totalRooms = await Room.count();
     const totalBookings = await Booking.count();
     const activeBookings = await Booking.count({
@@ -302,9 +379,15 @@ exports.getPlatformStats = async (req, res) => {
           attributes: ["roomNumber", "roomType"],
           include: [
             {
-              model: User,
-              as: "owner",
-              attributes: ["username"],
+              model: Client,
+              as: "client",
+              include: [
+                {
+                  model: User,
+                  as: "user",
+                  attributes: ["username"],
+                },
+              ],
             },
           ],
         },

@@ -20,10 +20,10 @@ const Booking = () => {
       setRooms(res.data);
       setFilteredRooms(res.data);
 
-      // Extract unique study house names (owner usernames)
+      // Extract unique study house names (client usernames)
       const uniqueHouses = [
         ...new Set(
-          res.data.map((room) => room.owner?.username).filter(Boolean)
+          res.data.map((room) => room.client?.user?.username).filter(Boolean)
         ),
       ];
       setStudyHouses(uniqueHouses.sort());
@@ -38,7 +38,7 @@ const Booking = () => {
     // Filter by study house
     if (studyHouseFilter !== "all") {
       filtered = filtered.filter(
-        (room) => room.owner?.username === studyHouseFilter
+        (room) => room.client?.user?.username === studyHouseFilter
       );
     }
 

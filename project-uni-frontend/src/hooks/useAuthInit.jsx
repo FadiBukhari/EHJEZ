@@ -14,7 +14,6 @@ const useAuthInit = () => {
     // This ensures no sensitive data remains from previous implementation
     const oldAuthData = localStorage.getItem("auth-storage");
     if (oldAuthData) {
-      console.log("Clearing old auth data from localStorage for security");
       localStorage.removeItem("auth-storage");
     }
 

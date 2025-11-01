@@ -16,10 +16,10 @@ module.exports = (sequelize, DataTypes) => {
       basePrice: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
       description: DataTypes.TEXT,
 
-      ownerId: {
+      clientId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: "Users", key: "id" },
+        references: { model: "Clients", key: "id" },
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },

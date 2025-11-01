@@ -8,11 +8,12 @@ const {
   editProfile,
 } = require("../controllers/userController");
 const authenticateToken = require("../middlewares/authenticateToken");
+const { authLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
-router.post("/register", addUser);
-router.post("/login", loginUser);
+router.post("/register", authLimiter, addUser);
+router.post("/login", authLimiter, loginUser);
 router.post("/logout", logoutUser);
 router.get("/verify", authenticateToken, verifyAuth);
 router.get("/profile", authenticateToken, getProfile);

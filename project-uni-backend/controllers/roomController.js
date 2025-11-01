@@ -1,9 +1,9 @@
-const { Room, Booking, User } = require("../models");
+const { Room, Booking, User, Client } = require("../models");
 const { Op } = require("sequelize");
 
 exports.createRoom = async (req, res) => {
   try {
-    const ownerId = req.user.userId;
+    const userId = req.user.userId;
     const { roomNumber, roomType, capacity, status, basePrice, description } =
       req.body;
 
@@ -30,22 +30,16 @@ exports.createRoom = async (req, res) => {
       return res.status(400).json({ message: "Base price must be positive" });
     }
 
-    // Get owner info to inherit operating hours
-    const owner = await User.findByPk(ownerId);
-    if (!owner) {
-      return res.status(404).json({ message: "Owner not found" });
-    }
+    // Get client profile
+    const client = await Client.findOne({
+      where: { userId },
+      include: [{ model: User, as: "user", attributes: ["username"] }],
+    });
 
-    if (owner.role !== "client") {
+    if (!client) {
       return res.status(403).json({
-        message: "Only clients can create rooms",
-      });
-    }
-
-    if (!owner.openingHours || !owner.closingHours) {
-      return res.status(400).json({
         message:
-          "Please set your business opening and closing hours in your profile first",
+          "Only clients can create rooms. Please create a client profile first.",
       });
     }
 
@@ -54,7 +48,7 @@ exports.createRoom = async (req, res) => {
       return res.status(400).json({ message: "Room number already exists" });
 
     const room = await Room.create({
-      ownerId,
+      clientId: client.id,
       roomNumber,
       roomType,
       capacity,
@@ -71,8 +65,16 @@ exports.createRoom = async (req, res) => {
 
 exports.updateRoom = async (req, res) => {
   try {
+    const userId = req.user.userId;
+
+    // Get client profile
+    const client = await Client.findOne({ where: { userId } });
+    if (!client) {
+      return res.status(403).json({ message: "Client profile not found" });
+    }
+
     const room = await Room.findByPk(req.params.id);
-    if (!room || room.ownerId !== req.user.userId) {
+    if (!room || room.clientId !== client.id) {
       return res
         .status(404)
         .json({ message: "Room not found or unauthorized" });
@@ -98,10 +100,19 @@ exports.updateRoom = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.deleteRoom = async (req, res) => {
   try {
+    const userId = req.user.userId;
+
+    // Get client profile
+    const client = await Client.findOne({ where: { userId } });
+    if (!client) {
+      return res.status(403).json({ message: "Client profile not found" });
+    }
+
     const room = await Room.findByPk(req.params.id);
-    if (!room || room.ownerId !== req.user.userId) {
+    if (!room || room.clientId !== client.id) {
       return res
         .status(404)
         .json({ message: "Room not found or unauthorized" });
@@ -134,7 +145,15 @@ exports.deleteRoom = async (req, res) => {
 
 exports.getOwnedRooms = async (req, res) => {
   try {
-    const rooms = await Room.findAll({ where: { ownerId: req.user.userId } });
+    const userId = req.user.userId;
+
+    // Get client profile
+    const client = await Client.findOne({ where: { userId } });
+    if (!client) {
+      return res.status(403).json({ message: "Client profile not found" });
+    }
+
+    const rooms = await Room.findAll({ where: { clientId: client.id } });
     res.json(rooms);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -147,16 +166,15 @@ exports.getAllRooms = async (req, res) => {
       where: { status: "available" },
       include: [
         {
-          model: User,
-          as: "owner",
-          attributes: [
-            "id",
-            "username",
-            "openingHours",
-            "closingHours",
-            "latitude",
-            "longitude",
-            "address",
+          model: Client,
+          as: "client",
+          attributes: ["openingHours", "closingHours", "latitude", "longitude"],
+          include: [
+            {
+              model: User,
+              as: "user",
+              attributes: ["id", "username"],
+            },
           ],
         },
       ],
@@ -167,16 +185,23 @@ exports.getAllRooms = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.getBookedRooms = async (req, res) => {
   try {
-    const ownerId = req.user.userId;
+    const userId = req.user.userId;
+
+    // Get client profile
+    const client = await Client.findOne({ where: { userId } });
+    if (!client) {
+      return res.status(403).json({ message: "Client profile not found" });
+    }
 
     const bookings = await Booking.findAll({
       include: [
         {
           model: Room,
           as: "room",
-          where: { ownerId },
+          where: { clientId: client.id },
           attributes: ["id", "roomNumber", "roomType", "capacity"],
         },
         {
@@ -200,7 +225,13 @@ exports.getBookedRooms = async (req, res) => {
 exports.getRoomBookings = async (req, res) => {
   try {
     const roomId = req.params.id;
-    const clientId = req.user.userId;
+    const userId = req.user.userId;
+
+    // Get client profile
+    const client = await Client.findOne({ where: { userId } });
+    if (!client) {
+      return res.status(403).json({ message: "Client profile not found" });
+    }
 
     // Verify the room belongs to this client
     const room = await Room.findByPk(roomId);
@@ -208,7 +239,7 @@ exports.getRoomBookings = async (req, res) => {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    if (room.ownerId !== clientId) {
+    if (room.clientId !== client.id) {
       return res.status(403).json({
         message: "Unauthorized: You can only view bookings for your own rooms",
       });
@@ -258,8 +289,8 @@ exports.getRoomAvailability = async (req, res) => {
     const room = await Room.findByPk(roomId, {
       include: [
         {
-          model: User,
-          as: "owner",
+          model: Client,
+          as: "client",
           attributes: ["openingHours", "closingHours"],
         },
       ],
@@ -288,8 +319,8 @@ exports.getRoomAvailability = async (req, res) => {
       room: {
         id: room.id,
         roomNumber: room.roomNumber,
-        openingHours: room.owner?.openingHours,
-        closingHours: room.owner?.closingHours,
+        openingHours: room.client?.openingHours,
+        closingHours: room.client?.closingHours,
       },
       bookedSlots: bookings,
     });

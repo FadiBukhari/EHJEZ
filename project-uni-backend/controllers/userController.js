@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
-const { User } = require("../models");
+const { User, Role, Client } = require("../models");
 
 exports.addUser = async (req, res) => {
   try {
@@ -46,15 +46,13 @@ exports.addUser = async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    // Force role to 'user' for all public registrations
+    // Force roleId to 1 ('user') for all public registrations
     await User.create({
       username,
       password: hashed,
       email,
       phoneNumber,
-      role: "user",
-      openingHours: null,
-      closingHours: null,
+      roleId: 1, // 'user' role
     });
 
     res.status(201).json({ message: "User registered successfully" });
@@ -67,14 +65,18 @@ exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      include: [{ model: Role, as: "role", attributes: ["name"] }],
+    });
     if (!user) return res.status(404).json({ message: "Invalid credentials" });
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(404).json({ message: "Invalid credentials" });
 
+    const roleName = user.role.name;
     const token = jwt.sign(
-      { userId: user.id, role: user.role, email: user.email },
+      { userId: user.id, role: roleName, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -87,7 +89,7 @@ exports.loginUser = async (req, res) => {
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
-    const usersent = { username: user.username, role: user.role };
+    const usersent = { username: user.username, role: roleName };
     res.json({ user: usersent });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -115,7 +117,8 @@ exports.verifyAuth = async (req, res) => {
     // Token already verified by authenticateToken middleware
     // req.user contains the JWT payload (userId, role, email)
     const user = await User.findByPk(req.user.userId, {
-      attributes: ["id", "username", "email", "role", "phoneNumber"],
+      attributes: ["id", "username", "email", "phoneNumber"],
+      include: [{ model: Role, as: "role", attributes: ["name"] }],
     });
 
     if (!user) {
@@ -125,7 +128,7 @@ exports.verifyAuth = async (req, res) => {
     res.json({
       user: {
         username: user.username,
-        role: user.role,
+        role: user.role.name,
         email: user.email,
       },
     });
@@ -138,6 +141,14 @@ exports.getProfile = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.userId, {
       attributes: { exclude: ["password"] },
+      include: [
+        {
+          model: Client,
+          as: "clientProfile",
+          required: false,
+          attributes: ["openingHours", "closingHours", "latitude", "longitude"],
+        },
+      ],
     });
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -150,17 +161,15 @@ exports.getProfile = async (req, res) => {
 exports.editProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const {
-      username,
-      email,
-      phoneNumber,
-      openingHours,
-      closingHours,
-      address,
-      latitude,
-      longitude,
-    } = req.body;
-    const user = await User.findByPk(userId);
+    const { username, email, phoneNumber, openingHours, closingHours } =
+      req.body;
+
+    const user = await User.findByPk(userId, {
+      include: [
+        { model: Role, as: "role", attributes: ["name"] },
+        { model: Client, as: "clientProfile", required: false },
+      ],
+    });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const uniqueChecks = [];
@@ -187,20 +196,26 @@ exports.editProfile = async (req, res) => {
     if (email) updates.email = email;
     if (phoneNumber) updates.phoneNumber = phoneNumber;
 
-    // Allow clients to update operating hours and location
-    if (user.role === "client") {
-      if (openingHours !== undefined) updates.openingHours = openingHours;
-      if (closingHours !== undefined) updates.closingHours = closingHours;
-      if (address !== undefined) updates.address = address;
-      if (latitude !== undefined) updates.latitude = latitude;
-      if (longitude !== undefined) updates.longitude = longitude;
+    if (Object.keys(updates).length > 0) {
+      await user.update(updates);
     }
 
-    if (Object.keys(updates).length === 0) {
-      return res.status(400).json({ message: "No valid fields to update" });
+    // Update client profile if it exists and hours are provided
+    if (user.clientProfile && (openingHours || closingHours)) {
+      const clientUpdates = {};
+      if (openingHours !== undefined) clientUpdates.openingHours = openingHours;
+      if (closingHours !== undefined) clientUpdates.closingHours = closingHours;
+
+      if (Object.keys(clientUpdates).length > 0) {
+        await user.clientProfile.update(clientUpdates);
+      }
     }
 
-    await user.update(updates);
+    // Reload user with updated data
+    await user.reload({
+      include: [{ model: Client, as: "clientProfile", required: false }],
+    });
+
     const { password, ...safeUser } = user.toJSON();
     res.json({ message: "Profile updated successfully", user: safeUser });
   } catch (err) {

@@ -59,6 +59,8 @@
   color: #333;
   background: white;
   flex-grow: 1;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .room-card-title {
@@ -75,16 +77,21 @@
   gap: 8px;
   font-size: 14px;
   line-height: 1.5;
+  flex-wrap: wrap;
 
   .info-label {
     font-weight: 600;
     color: #666;
     min-width: fit-content;
+    flex-shrink: 0;
   }
 
   .info-value {
     color: #1a1a1a;
     font-weight: 500;
+    word-break: break-word;
+    flex: 1;
+    min-width: 0;
   }
 
   &.location {
@@ -152,5 +159,109 @@
 
   &:active {
     transform: translateY(0);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .room-card-user {
+    width: 100%;
+    max-width: 400px;
+    min-height: auto;
+
+    &:hover {
+      transform: translateY(-4px) scale(1.01);
+    }
+  }
+
+  .room-card-user-img {
+    height: 180px;
+  }
+
+  .room-card-user-details {
+    padding: 16px 20px;
+    gap: 8px;
+  }
+
+  .room-card-title {
+    font-size: 20px;
+    margin: 0 0 6px 0;
+  }
+
+  .room-info {
+    font-size: 13px;
+    gap: 6px;
+
+    &.location .info-value,
+    &.hours .info-value {
+      font-size: 12px;
+    }
+  }
+
+  .room-price {
+    margin-top: 6px;
+    padding-top: 10px;
+    flex-wrap: wrap;
+
+    .price-value {
+      font-size: 24px;
+    }
+
+    .price-label,
+    .price-period {
+      font-size: 13px;
+    }
+  }
+
+  .room-card-user button {
+    width: calc(100% - 40px);
+    margin: 0 20px 20px 20px;
+    height: 40px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .room-card-user {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .room-card-user-img {
+    height: 160px;
+  }
+
+  .room-card-user-details {
+    padding: 14px 16px;
+  }
+
+  .room-card-title {
+    font-size: 18px;
+  }
+
+  .room-info {
+    font-size: 12px;
+
+    .info-label {
+      min-width: 70px;
+    }
+
+    .info-value {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  .room-price {
+    .price-value {
+      font-size: 22px;
+    }
+  }
+
+  .room-card-user button {
+    width: calc(100% - 32px);
+    margin: 0 16px 16px 16px;
+    height: 38px;
+    font-size: 13px;
   }
 }

@@ -42,9 +42,10 @@ const MyBookings = () => {
                 <h3 className="booking-room-title">
                   {room.room?.roomType?.replace(/_/g, " ") || "Study Room"}
                 </h3>
-                {room.room?.owner?.username && (
+                {room.room?.client?.user?.username && (
                   <p className="study-house-name">
-                    <strong>📍 Study House:</strong> {room.room.owner.username}
+                    <strong>📍 Study House:</strong>{" "}
+                    {room.room.client.user.username}
                   </p>
                 )}
                 <div className="booking-info-grid">

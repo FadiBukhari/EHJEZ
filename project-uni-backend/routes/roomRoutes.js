@@ -12,10 +12,11 @@ const {
 
 const authenticateToken = require("../middlewares/authenticateToken");
 const authorizeClient = require("../middlewares/authorizeClient");
+const { createLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
-router.post("/", authenticateToken, authorizeClient, createRoom);
+router.post("/", createLimiter, authenticateToken, authorizeClient, createRoom);
 router.put("/:id", authenticateToken, authorizeClient, updateRoom);
 router.delete("/:id", authenticateToken, authorizeClient, deleteRoom);
 router.get("/owned", authenticateToken, authorizeClient, getOwnedRooms);

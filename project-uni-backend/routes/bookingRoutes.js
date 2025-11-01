@@ -9,10 +9,17 @@ const {
 const authenticateToken = require("../middlewares/authenticateToken");
 const authorizeUser = require("../middlewares/authorizeUser");
 const authorizeClient = require("../middlewares/authorizeClient");
+const { bookingLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
-router.post("/", authenticateToken, authorizeUser, createBooking);
+router.post(
+  "/",
+  bookingLimiter,
+  authenticateToken,
+  authorizeUser,
+  createBooking
+);
 router.get("/my", authenticateToken, authorizeUser, getUserBookings);
 router.put(
   "/:id/status",
