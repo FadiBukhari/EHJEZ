@@ -15,7 +15,8 @@ const router = express.Router();
 router.post("/register", authLimiter, addUser);
 router.post("/login", authLimiter, loginUser);
 router.post("/logout", logoutUser);
-router.get("/verify", authenticateToken, verifyAuth);
+// Verify endpoint uses optional auth middleware
+router.get("/verify", verifyAuth);
 router.get("/profile", authenticateToken, getProfile);
 router.put("/editprofile", authenticateToken, editProfile);
 

@@ -114,18 +114,39 @@ exports.logoutUser = async (req, res) => {
 
 exports.verifyAuth = async (req, res) => {
   try {
-    // Token already verified by authenticateToken middleware
-    // req.user contains the JWT payload (userId, role, email)
-    const user = await User.findByPk(req.user.userId, {
+    // Check if token exists in cookies or headers
+    const token =
+      req.cookies.token ||
+      (req.headers["authorization"] &&
+        req.headers["authorization"].split(" ")[1]);
+
+    if (!token) {
+      // No token means user is not authenticated - this is OK
+      return res.status(200).json({ authenticated: false });
+    }
+
+    // Verify the token
+    const jwt = require("jsonwebtoken");
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      // Invalid or expired token
+      return res.status(200).json({ authenticated: false });
+    }
+
+    // Token is valid, fetch user data
+    const user = await User.findByPk(decoded.userId, {
       attributes: ["id", "username", "email", "phoneNumber"],
       include: [{ model: Role, as: "role", attributes: ["name"] }],
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(200).json({ authenticated: false });
     }
 
     res.json({
+      authenticated: true,
       user: {
         username: user.username,
         role: user.role.name,
@@ -133,6 +154,7 @@ exports.verifyAuth = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error("Verify auth error:", err);
     res.status(500).json({ error: err.message });
   }
 };
