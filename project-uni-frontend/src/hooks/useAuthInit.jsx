@@ -22,10 +22,15 @@ const useAuthInit = () => {
         // This will send the HTTP-only cookie automatically
         const response = await API.get("/users/verify");
 
-        // User data comes from JWT token (verified by backend)
-        login(response.data.user);
+        // Check if user is authenticated
+        if (response.data.authenticated && response.data.user) {
+          login(response.data.user);
+        } else {
+          // No valid session - user is not logged in
+          logout();
+        }
       } catch {
-        // No valid session - user is not logged in
+        // Error occurred - user is not logged in
         logout();
       }
     };
