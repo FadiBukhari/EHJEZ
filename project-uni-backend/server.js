@@ -5,7 +5,6 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { sequelize } = require("./models");
 const authenticateToken = require("./middlewares/authenticateToken.js");
-const { generalLimiter } = require("./middlewares/rateLimiter.js");
 const userRoutes = require("./routes/userRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
@@ -21,9 +20,6 @@ app.use(
     credentials: true, // Allow cookies to be sent
   })
 );
-
-// Apply general rate limiter to all routes
-app.use(generalLimiter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

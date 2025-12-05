@@ -8,12 +8,11 @@ const {
   editProfile,
 } = require("../controllers/userController");
 const authenticateToken = require("../middlewares/authenticateToken");
-const { authLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
-router.post("/register", authLimiter, addUser);
-router.post("/login", authLimiter, loginUser);
+router.post("/register", addUser);
+router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 // Verify endpoint uses optional auth middleware
 router.get("/verify", verifyAuth);

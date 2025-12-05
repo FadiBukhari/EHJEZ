@@ -9,13 +9,11 @@ const {
 const authenticateToken = require("../middlewares/authenticateToken");
 const authorizeUser = require("../middlewares/authorizeUser");
 const authorizeClient = require("../middlewares/authorizeClient");
-const { bookingLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
 router.post(
   "/",
-  bookingLimiter,
   authenticateToken,
   authorizeUser,
   createBooking
