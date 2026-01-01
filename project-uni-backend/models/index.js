@@ -7,6 +7,7 @@ const Client = require("./client")(sequelize, DataTypes);
 const Room = require("./room")(sequelize, DataTypes);
 const Booking = require("./booking")(sequelize, DataTypes);
 const Notification = require("./notification")(sequelize, DataTypes);
+const Review = require("./review")(sequelize, DataTypes);
 
 // Role - User relationship (One-to-Many)
 Role.hasMany(User, { foreignKey: "roleId", as: "users" });
@@ -42,6 +43,16 @@ User.hasMany(Notification, {
 Notification.belongsTo(User, { as: "sender", foreignKey: "senderId" });
 Notification.belongsTo(User, { as: "receiver", foreignKey: "receiverId" });
 
+// Review relationships
+User.hasMany(Review, { foreignKey: "userId", as: "reviews" });
+Review.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+Client.hasMany(Review, { foreignKey: "clientId", as: "reviews" });
+Review.belongsTo(Client, { foreignKey: "clientId", as: "client" });
+
+Booking.hasOne(Review, { foreignKey: "bookingId", as: "review" });
+Review.belongsTo(Booking, { foreignKey: "bookingId", as: "booking" });
+
 module.exports = {
   sequelize,
   Sequelize,
@@ -51,4 +62,5 @@ module.exports = {
   Room,
   Booking,
   Notification,
+  Review,
 };

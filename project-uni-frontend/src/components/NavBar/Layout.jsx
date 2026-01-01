@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import NavBar from "./NavBar.jsx";
+import ChatWidget from "../ChatWidget";
 import "./Footer.scss";
 
 const Layout = () => {
@@ -17,6 +18,7 @@ const Layout = () => {
       <main>
         <Outlet />
       </main>
+      <ChatWidget />
       {location.pathname === "/signin" || location.pathname === "/signup" ? (
         <></>
       ) : (

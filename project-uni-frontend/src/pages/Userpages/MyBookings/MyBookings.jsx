@@ -2,29 +2,68 @@ import { useEffect, useState } from "react";
 import "./MyBookings.scss";
 import API from "../../../services/api";
 import { toast } from "react-toastify";
+import { FaStar } from "react-icons/fa";
+import ReviewModal from "../../../components/ReviewModal";
 
 const MyBookings = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [reviewableBookings, setReviewableBookings] = useState({});
+
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const res = await API.get("/bookings/my");
+      setRooms(res.data);
+
+      // Check which bookings can be reviewed
+      const reviewableStatus = {};
+      for (const booking of res.data) {
+        try {
+          const canReviewRes = await API.get(`/reviews/can-review/${booking.id}`);
+          reviewableStatus[booking.id] = canReviewRes.data;
+        } catch {
+          reviewableStatus[booking.id] = { canReview: false };
+        }
+      }
+      setReviewableBookings(reviewableStatus);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      if (error.response?.status !== 401 && error.response?.status !== 403) {
+        toast.error("Failed to load bookings. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        setLoading(true);
-        const res = await API.get("/bookings/my");
-        setRooms(res.data);
-      } catch (error) {
-        console.error("Error fetching bookings:", error);
-        if (error.response?.status !== 401 && error.response?.status !== 403) {
-          toast.error("Failed to load bookings. Please try again.");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBookings();
   }, []);
+
+  const handleReviewClick = (booking) => {
+    setSelectedBooking(booking);
+    setReviewModalOpen(true);
+  };
+
+  const handleReviewSubmitted = () => {
+    // Refresh the reviewable status
+    fetchBookings();
+  };
+
+  const canReview = (bookingId) => {
+    return reviewableBookings[bookingId]?.canReview === true;
+  };
+
+  const hasReviewed = (bookingId) => {
+    return reviewableBookings[bookingId]?.review !== undefined;
+  };
+
+  const getExistingReview = (bookingId) => {
+    return reviewableBookings[bookingId]?.review;
+  };
 
   return (
     <div className="mybooking-container">
@@ -92,6 +131,31 @@ const MyBookings = () => {
                     {room.status.charAt(0).toUpperCase() + room.status.slice(1)}
                   </div>
                 )}
+
+                {/* Review Section */}
+                <div className="review-section">
+                  {canReview(room.id) && (
+                    <button
+                      className="review-btn"
+                      onClick={() => handleReviewClick(room)}
+                    >
+                      <FaStar /> Leave a Review
+                    </button>
+                  )}
+                  {hasReviewed(room.id) && (
+                    <div className="reviewed-badge">
+                      <div className="stars">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <FaStar
+                            key={star}
+                            className={star <= getExistingReview(room.id)?.rating ? "filled" : ""}
+                          />
+                        ))}
+                      </div>
+                      <span>Reviewed</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))
@@ -101,6 +165,14 @@ const MyBookings = () => {
           </div>
         )}
       </div>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        booking={selectedBooking}
+        onReviewSubmitted={handleReviewSubmitted}
+      />
     </div>
   );
 };

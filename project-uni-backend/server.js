@@ -11,6 +11,8 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const clientRoutes = require("./routes/clientRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -51,3 +53,5 @@ app.use("/bookings", bookingRoutes);
 app.use("/notifications", notificationRoutes);
 app.use("/admin", adminRoutes);
 app.use("/client", clientRoutes);
+app.use("/chat", chatRoutes);
+app.use("/reviews", reviewRoutes);
