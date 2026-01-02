@@ -21,21 +21,26 @@ exports.createReview = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Check if booking is completed (approved and date has passed)
+    // Check if booking is completed (approved and date has passed or is today)
     if (booking.status !== "approved") {
       return res.status(400).json({ 
         message: "You can only review after your booking is approved" 
       });
     }
 
-    // Check if booking date has passed
-    const bookingDate = new Date(booking.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Check if booking date has passed or is today
+    // Handle both Date objects and strings
+    let bookingDateStr;
+    if (booking.date instanceof Date) {
+      bookingDateStr = booking.date.toISOString().split('T')[0];
+    } else {
+      bookingDateStr = String(booking.date).split('T')[0];
+    }
+    const todayStr = new Date().toISOString().split('T')[0];
     
-    if (bookingDate > today) {
+    if (bookingDateStr > todayStr) {
       return res.status(400).json({ 
-        message: "You can only review after your booking date has passed" 
+        message: "You can only review after your booking date" 
       });
     }
 
@@ -150,12 +155,17 @@ exports.canReviewBooking = async (req, res) => {
       return res.json({ canReview: false, reason: "Booking not approved yet" });
     }
 
-    // Check if booking date has passed
-    const bookingDate = new Date(booking.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Check if booking date has passed or is today
+    // Handle both Date objects and strings
+    let bookingDateStr;
+    if (booking.date instanceof Date) {
+      bookingDateStr = booking.date.toISOString().split('T')[0];
+    } else {
+      bookingDateStr = String(booking.date).split('T')[0];
+    }
+    const todayStr = new Date().toISOString().split('T')[0];
     
-    if (bookingDate > today) {
+    if (bookingDateStr > todayStr) {
       return res.json({ canReview: false, reason: "Booking date has not passed yet" });
     }
 
@@ -212,6 +222,61 @@ exports.deleteReview = async (req, res) => {
     res.json({ message: "Review deleted successfully" });
   } catch (error) {
     console.error("Delete review error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get reviews for the logged-in client (study house owner)
+exports.getMyClientReviews = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // Find the client associated with this user
+    const client = await Client.findOne({ where: { userId } });
+    
+    if (!client) {
+      return res.status(404).json({ message: "Client profile not found" });
+    }
+
+    const reviews = await Review.findAll({
+      where: { clientId: client.id },
+      include: [
+        { 
+          model: User, 
+          as: "user", 
+          attributes: ["id", "username"] 
+        },
+        {
+          model: Booking,
+          as: "booking",
+          include: [{ 
+            model: Room, 
+            as: "room", 
+            attributes: ["id", "roomNumber", "roomType"] 
+          }],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    // Calculate average rating
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : 0;
+
+    // Rating distribution
+    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    reviews.forEach(review => {
+      distribution[review.rating]++;
+    });
+
+    res.json({
+      reviews,
+      averageRating: parseFloat(averageRating),
+      totalReviews: reviews.length,
+      distribution,
+    });
+  } catch (error) {
+    console.error("Get my client reviews error:", error);
     res.status(500).json({ error: error.message });
   }
 };

@@ -24,26 +24,31 @@ exports.getClientStats = async (req, res) => {
       where: { clientId: client.id },
     });
 
+    // Get all room IDs for this client
+    const clientRooms = await Room.findAll({
+      where: { clientId: client.id },
+      attributes: ["id"],
+    });
+    const roomIds = clientRooms.map((r) => r.id);
+
     // Total bookings for this client's rooms
     const totalBookings = await Booking.count({
-      include: [
-        {
-          model: Room,
-          as: "room",
-          where: { clientId: client.id },
-        },
-      ],
+      where: {
+        roomId: { [Op.in]: roomIds },
+      },
     });
 
     // Recent bookings for this client's rooms
     const recentBookings = await Booking.findAll({
+      where: {
+        roomId: { [Op.in]: roomIds },
+      },
       limit: 10,
       order: [["createdAt", "DESC"]],
       include: [
         {
           model: Room,
           as: "room",
-          where: { clientId: client.id },
           attributes: ["roomNumber", "roomType"],
         },
         {

@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       roomNumber: { type: DataTypes.STRING, allowNull: false, unique: true },
       roomType: {
-        type: DataTypes.ENUM("single", "double", "suite"),
+        type: DataTypes.ENUM("single", "double", "suite", "classroom", "meeting_room", "private_office", "coworking"),
         allowNull: false,
       },
       capacity: { type: DataTypes.INTEGER, allowNull: false },
@@ -15,6 +15,28 @@ module.exports = (sequelize, DataTypes) => {
       },
       basePrice: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
       description: DataTypes.TEXT,
+
+      // Room Features
+      hasWhiteboard: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      hasWifi: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      hasProjector: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      hasTV: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      hasAC: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
 
       clientId: {
         type: DataTypes.INTEGER,
