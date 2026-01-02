@@ -12,10 +12,17 @@ const AddRoom = () => {
     basePrice: "",
     status: "available",
     description: "",
+    hasWhiteboard: false,
+    hasWifi: false,
+    hasProjector: false,
+    hasTV: false,
+    hasAC: false,
   });
 
-  const handleChange = (e) =>
-    setRoom({ ...room, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setRoom({ ...room, [name]: type === "checkbox" ? checked : value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,6 +68,10 @@ const AddRoom = () => {
         <option value="single">Single</option>
         <option value="double">Double</option>
         <option value="suite">Suite</option>
+        <option value="classroom">Classroom</option>
+        <option value="meeting_room">Meeting Room</option>
+        <option value="private_office">Private Office</option>
+        <option value="coworking">Coworking</option>
       </select>
 
       <input
@@ -104,6 +115,57 @@ const AddRoom = () => {
         onChange={handleChange}
         className="input"
       />
+
+      <div className="features-section">
+        <h3>Room Features</h3>
+        <div className="features-grid">
+          <label className="feature-checkbox">
+            <input
+              type="checkbox"
+              name="hasWhiteboard"
+              checked={room.hasWhiteboard}
+              onChange={handleChange}
+            />
+            <span>Whiteboard</span>
+          </label>
+          <label className="feature-checkbox">
+            <input
+              type="checkbox"
+              name="hasWifi"
+              checked={room.hasWifi}
+              onChange={handleChange}
+            />
+            <span>Wi-Fi</span>
+          </label>
+          <label className="feature-checkbox">
+            <input
+              type="checkbox"
+              name="hasProjector"
+              checked={room.hasProjector}
+              onChange={handleChange}
+            />
+            <span>Projector</span>
+          </label>
+          <label className="feature-checkbox">
+            <input
+              type="checkbox"
+              name="hasTV"
+              checked={room.hasTV}
+              onChange={handleChange}
+            />
+            <span>TV</span>
+          </label>
+          <label className="feature-checkbox">
+            <input
+              type="checkbox"
+              name="hasAC"
+              checked={room.hasAC}
+              onChange={handleChange}
+            />
+            <span>AC</span>
+          </label>
+        </div>
+      </div>
 
       <button className="btn-primary w-full">Create Room</button>
     </form>

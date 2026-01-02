@@ -1,13 +1,17 @@
 import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import RoomCard from "../../../components/RoomCard/RoomCard";
 import "./Booking.scss";
 import API from "../../../services/api";
 
 const Booking = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [priceFilter, setPriceFilter] = useState("none");
-  const [studyHouseFilter, setStudyHouseFilter] = useState("all");
+  const [studyHouseFilter, setStudyHouseFilter] = useState(
+    searchParams.get("studyhouse") || "all"
+  );
   const [studyHouses, setStudyHouses] = useState([]);
 
   useEffect(() => {
@@ -54,7 +58,14 @@ const Booking = () => {
     }
 
     setFilteredRooms(filtered);
-  }, [rooms, priceFilter, studyHouseFilter]);
+
+    // Update URL params
+    if (studyHouseFilter !== "all") {
+      setSearchParams({ studyhouse: studyHouseFilter });
+    } else {
+      setSearchParams({});
+    }
+  }, [rooms, priceFilter, studyHouseFilter, setSearchParams]);
 
   useEffect(() => {
     applyFilters();

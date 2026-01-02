@@ -215,8 +215,12 @@ const StudyHouseMap = () => {
     setFilteredHouses(result);
   }, [studyHouses, userLocation, sortBy, radiusFilter, searchQuery]);
 
-  const handleViewRooms = () => {
-    navigate("/booking");
+  const handleViewRooms = (house) => {
+    if (house?.username) {
+      navigate(`/booking?studyhouse=${encodeURIComponent(house.username)}`);
+    } else {
+      navigate("/booking");
+    }
   };
 
   const isOpen = (openingHours, closingHours) => {
@@ -355,7 +359,7 @@ const StudyHouseMap = () => {
                     className="view-rooms-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleViewRooms();
+                      handleViewRooms(house);
                     }}
                   >
                     View Rooms
@@ -429,7 +433,7 @@ const StudyHouseMap = () => {
                   )}
                   <button
                     className="popup-btn"
-                    onClick={() => handleViewRooms()}
+                    onClick={() => handleViewRooms(house)}
                   >
                     View Rooms →
                   </button>

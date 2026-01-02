@@ -79,6 +79,14 @@ const NavBar = () => {
             >
               Approve Bookings
             </Link>
+            <Link
+              to="/client/reviews"
+              className={`link ${
+                location.pathname === "/client/reviews" ? "selected" : ""
+              }`}
+            >
+              Reviews
+            </Link>
           </>
         )}
         {user?.role == "admin" && (

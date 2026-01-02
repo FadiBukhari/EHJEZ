@@ -1,11 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import "./RoomCard.scss";
+import { getRoomLogo } from "../../utils/StudyhouseLogos";
 
 const RoomCard = ({ room }) => {
   const navigate = useNavigate();
   const handleBookNow = () => {
     navigate(`/book/${room.id}`, { state: { room } });
   };
+
+  // Get the study house logo for this room
+  const roomLogo = getRoomLogo(room);
 
   // Format room type for better display
   const formatRoomType = (type) => {
@@ -15,13 +19,30 @@ const RoomCard = ({ room }) => {
       .join(" ");
   };
 
+  // Get room features
+  const getFeatures = () => {
+    const features = [];
+    if (room.hasWhiteboard) features.push("Whiteboard");
+    if (room.hasWifi) features.push("Wi-Fi");
+    if (room.hasProjector) features.push("Projector");
+    if (room.hasTV) features.push("TV");
+    if (room.hasAC) features.push("AC");
+    return features;
+  };
+
+  const features = getFeatures();
+
   return (
     <>
       <div className="room-card-user">
         <img
           className="room-card-user-img"
-          src="/small1.png"
-          alt={`${room.roomType} room`}
+          src={roomLogo}
+          alt={`${room.client?.user?.username || "Study House"} logo`}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/small1.png";
+          }}
         />
         <div className="room-card-user-details">
           <h3 className="room-card-title">
@@ -43,6 +64,15 @@ const RoomCard = ({ room }) => {
               <span className="info-value">
                 {room.client.openingHours} - {room.client.closingHours}
               </span>
+            </div>
+          )}
+          {features.length > 0 && (
+            <div className="room-features">
+              {features.map((feature, index) => (
+                <span key={index} className="feature-tag">
+                  ✓ {feature}
+                </span>
+              ))}
             </div>
           )}
           <div className="room-price">

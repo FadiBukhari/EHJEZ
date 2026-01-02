@@ -34,104 +34,123 @@
 
 .mybooking-content {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 28px;
   margin-top: 8px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .booking-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(76, 77, 220, 0.12);
+  border: 1px solid #e5e7eb;
   padding: 0;
-  border-radius: 16px;
+  border-radius: 20px;
   background: white;
-  box-shadow: 0 8px 24px rgba(76, 77, 220, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #4c4ddc 0%, #6061d0 100%);
-    opacity: 0;
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+  transition: all 0.3s ease;
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 16px 48px rgba(76, 77, 220, 0.2);
-    border-color: rgba(76, 77, 220, 0.3);
-
-    &::before {
-      opacity: 1;
-    }
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(76, 77, 220, 0.15);
+    border-color: #4c4ddc;
 
     .booked-img-room {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
   }
 }
 
 .booked-img-room {
-  border-radius: 0;
   width: 100%;
-  height: 220px;
+  height: 200px;
   object-fit: cover;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s ease;
+  background: #f3f4f6;
 }
 
 .booking-card-content {
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .booking-room-title {
-  color: #4c4ddc;
-  font-size: 22px;
+  color: #1f2937;
+  font-size: 24px;
   font-weight: 700;
-  margin: 0;
+  margin: 0 0 4px 0;
   letter-spacing: -0.02em;
   text-transform: capitalize;
 }
 
 .study-house-name {
-  color: #555;
+  color: #6b7280;
   font-size: 15px;
-  margin: 0;
+  margin: 0 0 4px 0;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   strong {
-    color: #666;
-    font-weight: 600;
+    color: #4b5563;
+    font-size: 16px;
+  }
+}
+
+.room-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+
+  .amenity {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    font-size: 12px;
+    color: #4b5563;
+    font-weight: 500;
+    white-space: nowrap;
   }
 }
 
 .booking-info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 2px solid #f3f4f6;
 
   .booking-info {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px;
-    background: rgba(76, 77, 220, 0.04);
+    gap: 12px;
+    padding: 14px 16px;
+    background: #ffffff;
     border-radius: 12px;
-    border: 1px solid rgba(76, 77, 220, 0.08);
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #d1d5db;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
 
     .info-icon {
-      font-size: 20px;
+      font-size: 22px;
       line-height: 1;
+      flex-shrink: 0;
     }
 
     div {
@@ -139,78 +158,66 @@
       flex-direction: column;
       gap: 2px;
       flex: 1;
+      min-width: 0;
     }
 
     .info-label {
       font-size: 11px;
-      color: #999;
+      color: #9ca3af;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .info-value {
-      font-size: 14px;
-      color: #1a1a1a;
+      font-size: 16px;
+      color: #1f2937;
       font-weight: 600;
       letter-spacing: -0.01em;
 
       &.price {
-        font-size: 18px;
-        color: #4c4ddc;
+        font-size: 22px;
+        color: #10b981;
         font-weight: 700;
       }
     }
 
     &.highlight {
-      background: linear-gradient(
-        135deg,
-        rgba(76, 77, 220, 0.08) 0%,
-        rgba(96, 97, 208, 0.08) 100%
-      );
-      border-color: rgba(76, 77, 220, 0.15);
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border-color: #86efac;
     }
   }
 }
 
 .booking-status {
   display: inline-block;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 12px;
   font-weight: 600;
   text-align: center;
   align-self: flex-start;
-  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 
   &.status-pending {
-    background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
-    color: #856404;
-  }
-
-  &.status-confirmed {
-    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-    color: #155724;
-  }
-
-  &.status-active {
-    background: linear-gradient(135deg, #cce5ff 0%, #b8daff 100%);
-    color: #004085;
+    background: #fef3c7;
+    color: #92400e;
   }
 
   &.status-approved {
-    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-    color: #155724;
+    background: #d1fae5;
+    color: #065f46;
   }
 
   &.status-completed {
-    background: linear-gradient(135deg, #d6d8db 0%, #c6c8ca 100%);
-    color: #383d41;
+    background: #e5e7eb;
+    color: #374151;
   }
 
   &.status-cancelled {
-    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-    color: #721c24;
+    background: #fee2e2;
+    color: #991b1b;
   }
 }
 

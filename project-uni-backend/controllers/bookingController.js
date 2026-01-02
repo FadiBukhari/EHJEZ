@@ -133,6 +133,25 @@ exports.getUserBookings = async (req, res) => {
   try {
     const bookings = await Booking.findAll({
       where: { customerId: req.user.userId, status: "approved" },
+      include: [
+        {
+          model: Room,
+          as: "room",
+          include: [
+            {
+              model: Client,
+              as: "client",
+              include: [
+                {
+                  model: User,
+                  as: "user",
+                  attributes: ["id", "username", "email"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
     res.json(bookings);

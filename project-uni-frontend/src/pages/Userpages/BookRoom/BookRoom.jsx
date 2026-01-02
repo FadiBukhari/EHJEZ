@@ -1,45 +1,76 @@
 // pages/BookRoom/BookRoom.jsx
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import "./BookRoom.scss";
 import { toast } from "react-toastify";
 import API from "../../../services/api";
+import { getRoomLogo } from "../../../utils/StudyhouseLogos";
 
 const BookRoom = () => {
   const { id: roomId } = useParams();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [checkIn, setCheckIn] = useState("14:00");
-  const [checkOut, setCheckOut] = useState("11:00");
+  const [selectedStartTime, setSelectedStartTime] = useState(null);
+  const [selectedDuration, setSelectedDuration] = useState(1);
   const [availableTimes, setAvailableTimes] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
-  const [refreshKey, setRefreshKey] = useState(0); // Used to force refresh
+  const [refreshKey, setRefreshKey] = useState(0);
   const { state } = useLocation();
   const room = useMemo(() => state?.room || {}, [state?.room]);
 
-  // Calculate hours and total price
-  const calculateHoursAndPrice = () => {
-    if (!checkIn || !checkOut || checkIn >= checkOut) {
-      return { hours: 0, totalPrice: 0 };
+  // Duration options in hours
+  const durationOptions = [1, 2, 3, 4, 5, 6];
+
+  // Generate next 7 days for easy date selection
+  const getNext7Days = () => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      days.push(date);
     }
-
-    const [inHour, inMin] = checkIn.split(":").map(Number);
-    const [outHour, outMin] = checkOut.split(":").map(Number);
-
-    const totalMinutes = outHour * 60 + outMin - (inHour * 60 + inMin);
-    const hours = totalMinutes / 60;
-    const totalPrice = hours * (room.basePrice || 0);
-
-    return { hours, totalPrice };
+    return days;
   };
 
-  const { hours, totalPrice } = calculateHoursAndPrice();
+  const next7Days = getNext7Days();
+
+  // Format date for display
+  const formatDay = (date) => {
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    return days[date.getDay()];
+  };
+
+  const formatDate = (date) => {
+    return date.getDate();
+  };
+
+  const formatMonth = (date) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return months[date.getMonth()];
+  };
+
+  const isToday = (date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  const isSameDay = (date1, date2) => {
+    return date1.toDateString() === date2.toDateString();
+  };
+
+  // Calculate check-out time based on start time and duration
+  const getCheckOutTime = () => {
+    if (!selectedStartTime) return null;
+    const [hour] = selectedStartTime.split(":").map(Number);
+    const endHour = hour + selectedDuration;
+    return `${endHour.toString().padStart(2, "0")}:00`;
+  };
+
+  // Calculate total price
+  const totalPrice = selectedDuration * (room.basePrice || 0);
 
   // Fetch booked times for the selected date
   useEffect(() => {
-    // Early return if no room data
     if (!room || !room.id) {
       toast.error("Room information not available");
       navigate("/booking");
@@ -48,21 +79,16 @@ const BookRoom = () => {
 
     const fetchBookedTimes = async () => {
       try {
-        // Use the new availability endpoint instead of bookings
         const response = await API.get(`/rooms/${roomId}/availability`);
-        // Backend returns { room, bookedSlots }
         const bookingsData = response.data.bookedSlots || [];
 
-        // Filter bookings for the selected date
-        // Use local date string to avoid timezone issues
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
         const day = String(selectedDate.getDate()).padStart(2, "0");
         const dateString = `${year}-${month}-${day}`;
 
         const dayBookings = bookingsData.filter((booking) => {
-          // booking.date is already in "YYYY-MM-DD" format from backend
-          const bookingDate = booking.date.split("T")[0]; // Handle both "YYYY-MM-DD" and "YYYY-MM-DDTHH:mm:ss"
+          const bookingDate = booking.date.split("T")[0];
           return (
             bookingDate === dateString &&
             (booking.status === "pending" || booking.status === "approved")
@@ -82,84 +108,128 @@ const BookRoom = () => {
     }
   }, [roomId, selectedDate, room, navigate, refreshKey]);
 
-  // Refetch bookings when the page becomes visible (e.g., user returns from payment)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        setRefreshKey((prev) => prev + 1);
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
-
   // Generate available time slots based on client's hours
   useEffect(() => {
     if (room.client && room.client.openingHours && room.client.closingHours) {
-      const openTime = room.client.openingHours; // e.g., "08:00:00"
-      const closeTime = room.client.closingHours; // e.g., "22:00:00"
+      const openTime = room.client.openingHours;
+      const closeTime = room.client.closingHours;
 
       const openHour = parseInt(openTime.split(":")[0]);
       const closeHour = parseInt(closeTime.split(":")[0]);
 
       const slots = [];
-      for (let hour = openHour; hour < closeHour; hour++) {
-        const timeSlot = `${hour.toString().padStart(2, "0")}:00`;
-        slots.push(timeSlot);
+      
+      // Handle overnight hours (e.g., 08:00 to 03:00 means open until 3 AM next day)
+      if (closeHour <= openHour) {
+        // Overnight: from openHour to midnight, then midnight to closeHour
+        for (let hour = openHour; hour < 24; hour++) {
+          const timeSlot = `${hour.toString().padStart(2, "0")}:00`;
+          slots.push(timeSlot);
+        }
+        for (let hour = 0; hour < closeHour; hour++) {
+          const timeSlot = `${hour.toString().padStart(2, "0")}:00`;
+          slots.push(timeSlot);
+        }
+      } else {
+        // Normal hours: from openHour to closeHour
+        for (let hour = openHour; hour < closeHour; hour++) {
+          const timeSlot = `${hour.toString().padStart(2, "0")}:00`;
+          slots.push(timeSlot);
+        }
       }
 
       setAvailableTimes(slots);
     }
   }, [room]);
 
+  // Reset start time when date changes
+  useEffect(() => {
+    setSelectedStartTime(null);
+  }, [selectedDate]);
+
   // Check if a time slot is booked
   const isTimeBooked = (time) => {
-    const result = bookedSlots.some((booking) => {
-      // Normalize time formats (remove seconds if present)
-      const bookingStart = booking.checkInTime?.slice(0, 5); // "14:00:00" -> "14:00"
-      const bookingEnd = booking.checkOutTime?.slice(0, 5); // "16:00:00" -> "16:00"
-      const currentTime = time.slice(0, 5); // Ensure time is also "HH:MM" format
-
-      // Check if current time falls within the booking range
-      const isBooked = currentTime >= bookingStart && currentTime < bookingEnd;
-
-      return isBooked;
+    return bookedSlots.some((booking) => {
+      const bookingStart = booking.checkInTime?.slice(0, 5);
+      const bookingEnd = booking.checkOutTime?.slice(0, 5);
+      const currentTime = time.slice(0, 5);
+      return currentTime >= bookingStart && currentTime < bookingEnd;
     });
-    return result;
+  };
+
+  // Check if a duration is valid (doesn't overlap with existing bookings)
+  const isDurationValid = (duration) => {
+    if (!selectedStartTime) return true;
+    
+    const [startHour] = selectedStartTime.split(":").map(Number);
+    const endHour = startHour + duration;
+    
+    // Check if it goes past closing time (handle overnight hours)
+    if (room.client?.closingHours) {
+      const closeHour = parseInt(room.client.closingHours.split(":")[0]);
+      const openHour = parseInt(room.client.openingHours?.split(":")[0] || "0");
+      
+      // For overnight hours (e.g., 08:00 to 03:00)
+      if (closeHour <= openHour) {
+        // If start is before midnight, can go up to 24 + closeHour
+        if (startHour >= openHour) {
+          if (endHour > 24 + closeHour) return false;
+        } else {
+          // Start is after midnight (e.g., 01:00), can only go up to closeHour
+          if (endHour > closeHour) return false;
+        }
+      } else {
+        // Normal hours
+        if (endHour > closeHour) return false;
+      }
+    }
+    
+    // Check if any hour in the range is booked
+    for (let h = startHour; h < endHour; h++) {
+      const normalizedHour = h % 24;
+      const timeSlot = `${normalizedHour.toString().padStart(2, "0")}:00`;
+      if (isTimeBooked(timeSlot)) return false;
+    }
+    
+    return true;
+  };
+
+  // Check if start time is in the past (for today)
+  const isTimePast = (time) => {
+    if (!isToday(selectedDate)) return false;
+    const now = new Date();
+    const [hour] = time.split(":").map(Number);
+    return hour <= now.getHours();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate checkout time is after checkin time
-    if (checkIn >= checkOut) {
-      toast.error("Check-out time must be after check-in time");
+    if (!selectedStartTime) {
+      toast.error("Please select a start time");
       return;
     }
 
-    // Calculate hours and price
-    const { hours, totalPrice } = calculateHoursAndPrice();
-
-    if (hours <= 0) {
-      toast.error("Invalid booking duration");
-      return;
-    }
+    const checkOut = getCheckOutTime();
 
     try {
       await API.post("/bookings/", {
         id: parseInt(roomId),
         date: selectedDate,
-        checkInTime: checkIn,
+        checkInTime: selectedStartTime,
         checkOutTime: checkOut,
         totalPrice: totalPrice,
       });
       toast.success("Booking request submitted successfully!");
       navigate(`/payment/${roomId}`, {
-        state: { room, selectedDate, checkIn, checkOut, totalPrice, hours },
+        state: { 
+          room, 
+          selectedDate, 
+          checkIn: selectedStartTime, 
+          checkOut, 
+          totalPrice,
+          hours: selectedDuration 
+        },
       });
     } catch (err) {
       console.error(err);
@@ -167,7 +237,6 @@ const BookRoom = () => {
     }
   };
 
-  // Return null if no room data (after hooks)
   if (!room || !room.id) {
     return null;
   }
@@ -182,126 +251,148 @@ const BookRoom = () => {
         >
           ← Back
         </button>
-        <h2>Book Room #{roomId}</h2>
-      </div>
-      <div className="book-room-details">
-        <img src="/small1.png" alt="Logoz" className="booking-logo" />
-        <p className="book-description">
-          <strong>Room Type:</strong> {room.roomType || "Single"}
-          <br />
-          <strong>Description:</strong>{" "}
-          {room.description || "No description available."}
-          <br />
-          <strong>Base Price:</strong> ${room.basePrice || "0"}
-          <br />
-          <strong>Capacity:</strong> {room.capacity || "1 person"}
-          <br />
-          <strong>Status:</strong> {room.status || "Available"}
-          <br />
-          <strong>Operating Hours:</strong>{" "}
-          {room.client?.openingHours?.slice(0, 5) || "N/A"} -{" "}
-          {room.client?.closingHours?.slice(0, 5) || "N/A"}
-        </p>
+        <h2>Book a Room</h2>
       </div>
 
-      {availableTimes.length > 0 && (
-        <div className="available-times-section">
-          <div className="times-header">
-            <h3>Available Times for {selectedDate.toLocaleDateString()}</h3>
+      {/* Room Info Card */}
+      <div className="room-info-card">
+        <img 
+          src={getRoomLogo(room)} 
+          alt={`${room.client?.user?.username || 'Study House'} logo`} 
+          className="room-thumb"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/small1.png";
+          }}
+        />
+        <div className="room-info-text">
+          <h3>{room.client?.user?.username || "Study House"}</h3>
+          <p className="room-type">{room.roomType} • {room.capacity} people</p>
+          <p className="room-price">${room.basePrice}<span>/hour</span></p>
+        </div>
+      </div>
+
+      {/* Step 1: Select Date */}
+      <div className="booking-step">
+        <div className="step-header">
+          <span className="step-number">1</span>
+          <h3>Select Date</h3>
+        </div>
+        <div className="date-selector">
+          {next7Days.map((date, index) => (
             <button
+              key={index}
               type="button"
-              className="refresh-btn"
-              onClick={() => setRefreshKey((prev) => prev + 1)}
-              title="Refresh availability"
+              className={`date-btn ${isSameDay(date, selectedDate) ? "selected" : ""} ${isToday(date) ? "today" : ""}`}
+              onClick={() => setSelectedDate(date)}
             >
-              🔄 Refresh
+              <span className="day-name">{isToday(date) ? "Today" : formatDay(date)}</span>
+              <span className="day-number">{formatDate(date)}</span>
+              <span className="month-name">{formatMonth(date)}</span>
             </button>
-          </div>
-          <div className="time-slots-grid">
-            {availableTimes.map((time) => {
+          ))}
+        </div>
+      </div>
+
+      {/* Step 2: Select Time */}
+      <div className="booking-step">
+        <div className="step-header">
+          <span className="step-number">2</span>
+          <h3>Select Start Time</h3>
+          <button
+            type="button"
+            className="refresh-btn-small"
+            onClick={() => setRefreshKey((prev) => prev + 1)}
+            title="Refresh availability"
+          >
+            🔄
+          </button>
+        </div>
+        <div className="time-selector">
+          {availableTimes.length > 0 ? (
+            availableTimes.map((time) => {
               const booked = isTimeBooked(time);
+              const past = isTimePast(time);
+              const disabled = booked || past;
+              
               return (
-                <div
+                <button
                   key={time}
-                  className={`time-slot ${booked ? "booked" : "available"}`}
-                  title={booked ? "This time is already booked" : "Available"}
+                  type="button"
+                  className={`time-btn ${selectedStartTime === time ? "selected" : ""} ${booked ? "booked" : ""} ${past ? "past" : ""}`}
+                  onClick={() => !disabled && setSelectedStartTime(time)}
+                  disabled={disabled}
                 >
-                  <span className="time">{time}</span>
-                  <span className="status-indicator">
-                    {booked ? "❌" : "✓"}
-                  </span>
-                </div>
+                  {time}
+                  {booked && <span className="booked-label">Booked</span>}
+                </button>
               );
-            })}
+            })
+          ) : (
+            <p className="no-times">Operating hours not available</p>
+          )}
+        </div>
+      </div>
+
+      {/* Step 3: Select Duration */}
+      <div className="booking-step">
+        <div className="step-header">
+          <span className="step-number">3</span>
+          <h3>Select Duration</h3>
+        </div>
+        <div className="duration-selector">
+          {durationOptions.map((duration) => {
+            const valid = isDurationValid(duration);
+            return (
+              <button
+                key={duration}
+                type="button"
+                className={`duration-btn ${selectedDuration === duration ? "selected" : ""} ${!valid ? "disabled" : ""}`}
+                onClick={() => valid && setSelectedDuration(duration)}
+                disabled={!valid}
+              >
+                {duration} {duration === 1 ? "Hour" : "Hours"}
+                <span className="duration-price">${(duration * room.basePrice).toFixed(0)}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Booking Summary */}
+      {selectedStartTime && (
+        <div className="booking-summary">
+          <h3>Booking Summary</h3>
+          <div className="summary-row">
+            <span>Date</span>
+            <span>{selectedDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
           </div>
-          <div className="legend">
-            <div className="legend-item">
-              <span className="legend-indicator available">✓</span>
-              <span>Available</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-indicator booked">❌</span>
-              <span>Booked</span>
-            </div>
+          <div className="summary-row">
+            <span>Time</span>
+            <span>{selectedStartTime} - {getCheckOutTime()}</span>
+          </div>
+          <div className="summary-row">
+            <span>Duration</span>
+            <span>{selectedDuration} {selectedDuration === 1 ? "hour" : "hours"}</span>
+          </div>
+          <div className="summary-row total">
+            <span>Total</span>
+            <span>${totalPrice.toFixed(2)}</span>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="booking-form-fields">
-        <div className="input-book-box">
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            dateFormat="yyyy-MM-dd"
-            className="input-book"
-            minDate={new Date()}
-          />
-        </div>
-        <div className="input-book-box">
-          <label>Check-in Time:</label>
-          <input
-            type="time"
-            value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
-            required
-            className="input-book"
-          />
-        </div>
-        <div className="input-book-box">
-          {" "}
-          <label>Check-out Time:</label>
-          <input
-            type="time"
-            value={checkOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-            required
-            className="input-book"
-          />
-        </div>
-
-        {hours > 0 && (
-          <div className="price-summary">
-            <div className="price-calculation">
-              <span className="calc-label">Duration:</span>
-              <span className="calc-value">
-                {hours} {hours === 1 ? "hour" : "hours"}
-              </span>
-            </div>
-            <div className="price-calculation">
-              <span className="calc-label">Rate:</span>
-              <span className="calc-value">${room.basePrice}/hour</span>
-            </div>
-            <div className="price-total">
-              <span className="total-label">Total Price:</span>
-              <span className="total-value">${totalPrice.toFixed(2)}</span>
-            </div>
-          </div>
-        )}
-
-        <button type="submit" disabled={hours <= 0}>
-          Book
-        </button>
-      </form>
+      {/* Book Button */}
+      <button
+        type="button"
+        className="book-btn"
+        onClick={handleSubmit}
+        disabled={!selectedStartTime}
+      >
+        {selectedStartTime 
+          ? `Book Now - $${totalPrice.toFixed(2)}` 
+          : "Select a time to continue"}
+      </button>
     </div>
   );
 };

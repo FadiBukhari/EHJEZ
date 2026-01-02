@@ -12,7 +12,19 @@ const EditRoom = () => {
   const [capacity, setCapacity] = useState(room.capacity || "");
   const [description, setDescription] = useState(room.description || "");
   const [roomType, setRoomType] = useState(room.roomType || "single");
+  const [features, setFeatures] = useState({
+    hasWhiteboard: room.hasWhiteboard || false,
+    hasWifi: room.hasWifi || false,
+    hasProjector: room.hasProjector || false,
+    hasTV: room.hasTV || false,
+    hasAC: room.hasAC || false,
+  });
   const navigate = useNavigate();
+
+  const handleFeatureChange = (e) => {
+    const { name, checked } = e.target;
+    setFeatures({ ...features, [name]: checked });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -32,6 +44,7 @@ const EditRoom = () => {
       basePrice: parseFloat(price),
       capacity: parseInt(capacity),
       description,
+      ...features,
     };
     API.put(`/rooms/${id}`, roomData)
       .then(() => {
@@ -84,6 +97,10 @@ const EditRoom = () => {
             <option value="single">Single</option>
             <option value="double">Double</option>
             <option value="suite">Suite</option>
+            <option value="classroom">Classroom</option>
+            <option value="meeting_room">Meeting Room</option>
+            <option value="private_office">Private Office</option>
+            <option value="coworking">Coworking</option>
           </select>
         </div>
         <div className="form-group">
@@ -121,6 +138,56 @@ const EditRoom = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+        </div>
+        <div className="form-group features">
+          <label>Room Features</label>
+          <div className="features-grid">
+            <label className="feature-checkbox">
+              <input
+                type="checkbox"
+                name="hasWhiteboard"
+                checked={features.hasWhiteboard}
+                onChange={handleFeatureChange}
+              />
+              <span>Whiteboard</span>
+            </label>
+            <label className="feature-checkbox">
+              <input
+                type="checkbox"
+                name="hasWifi"
+                checked={features.hasWifi}
+                onChange={handleFeatureChange}
+              />
+              <span>Wi-Fi</span>
+            </label>
+            <label className="feature-checkbox">
+              <input
+                type="checkbox"
+                name="hasProjector"
+                checked={features.hasProjector}
+                onChange={handleFeatureChange}
+              />
+              <span>Projector</span>
+            </label>
+            <label className="feature-checkbox">
+              <input
+                type="checkbox"
+                name="hasTV"
+                checked={features.hasTV}
+                onChange={handleFeatureChange}
+              />
+              <span>TV</span>
+            </label>
+            <label className="feature-checkbox">
+              <input
+                type="checkbox"
+                name="hasAC"
+                checked={features.hasAC}
+                onChange={handleFeatureChange}
+              />
+              <span>AC</span>
+            </label>
+          </div>
         </div>
         <div className="last-buttons">
           <button type="submit" className="submit-button">

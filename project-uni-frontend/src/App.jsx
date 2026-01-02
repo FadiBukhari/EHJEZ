@@ -18,6 +18,7 @@ import EditRoom from "./pages/Clientpages/EditRoom/EditRoom";
 import Bookings from "./pages/Clientpages/Bookings/Bookings";
 import ApproveBookings from "./pages/Clientpages/ApproveBookings/ApproveBookings";
 import ClientDashboard from "./pages/Clientpages/Dashboard/Dashboard";
+import ClientReviews from "./pages/Clientpages/Reviews/Reviews";
 import Dashboard from "./pages/Adminpages/Dashboard/Dashboard";
 import Clients from "./pages/Adminpages/Clients/Clients";
 import AddClient from "./pages/Adminpages/Clients/AddClient";
@@ -54,6 +55,7 @@ function App() {
               element={<ApproveBookings />}
             />
             <Route path="/client/dashboard" element={<ClientDashboard />} />
+            <Route path="/client/reviews" element={<ClientReviews />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/clients" element={<Clients />} />
             <Route path="/admin/clients/new" element={<AddClient />} />

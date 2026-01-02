@@ -1,20 +1,88 @@
 /**
- * Seed Presentation Data
+ * Complete Database Seed File
  * 
- * Creates all study houses and rooms from MAKE these.md for presentation
+ * This file seeds all necessary data for the EHJEZ booking system.
+ * Use this to set up the database on a new machine or reset to default state.
  * 
- * Usage: node seed-presentation-data.js
+ * Usage: node seed-complete-data.js
+ * 
+ * WARNING: This will clear ALL existing data and create fresh data.
  */
 
 require("dotenv").config();
-const { sequelize, Role, User, Client, Room } = require("./models");
+const { sequelize, Role, User, Client, Room, Booking, Review } = require("./models");
 const bcrypt = require("bcrypt");
 
-const seedData = async () => {
+const seedCompleteData = async () => {
   try {
+    console.log("🔄 Starting complete database seed...\n");
+    console.log("⚠️  WARNING: This will DELETE all existing data!\n");
+    
+    // Connect to database
     console.log("🔄 Connecting to database...");
     await sequelize.authenticate();
     console.log("✅ Database connected!\n");
+
+    // Sync database (force: true will drop all tables and recreate)
+    console.log("🔄 Resetting database schema...");
+    await sequelize.sync({ force: true });
+    console.log("✅ Database schema reset!\n");
+
+    // ============================================
+    // CREATE ROLES
+    // ============================================
+    console.log("📍 Creating roles...");
+    const [userRole, clientRole, adminRole] = await Role.bulkCreate([
+      { id: 1, roleName: "user" },
+      { id: 2, roleName: "client" },
+      { id: 3, roleName: "admin" },
+    ]);
+    console.log("✅ Created 3 roles\n");
+
+    // ============================================
+    // CREATE ADMIN
+    // ============================================
+    console.log("📍 Creating admin user...");
+    const adminPassword = await bcrypt.hash("admin123", 10);
+    await User.create({
+      username: "Admin",
+      email: "admin@ehjez.com",
+      password: adminPassword,
+      phoneNumber: "0790000000",
+      roleId: adminRole.id,
+    });
+    console.log("✅ Created admin user\n");
+
+    // ============================================
+    // CREATE TEST USERS
+    // ============================================
+    console.log("📍 Creating test users...");
+    const testUserPassword = await bcrypt.hash("Test@2026", 10);
+    
+    const [ahmed, sara, mohammed] = await User.bulkCreate([
+      {
+        username: "Ahmed",
+        email: "ahmed@test.com",
+        password: testUserPassword,
+        phoneNumber: "0781111111",
+        roleId: userRole.id,
+      },
+      {
+        username: "Sara",
+        email: "sara@test.com",
+        password: testUserPassword,
+        phoneNumber: "0782222222",
+        roleId: userRole.id,
+      },
+      {
+        username: "Mohammed",
+        email: "mohammed@test.com",
+        password: testUserPassword,
+        phoneNumber: "0783333333",
+        roleId: userRole.id,
+      },
+    ]);
+    console.log("✅ Created 3 test users\n");
 
     // ============================================
     // STUDY HOUSE 1: URUK
@@ -26,7 +94,7 @@ const seedData = async () => {
       email: "uruk@gmail.com",
       password: urukPassword,
       phoneNumber: "0781255281",
-      roleId: 2, // client
+      roleId: clientRole.id,
     });
     
     const urukClient = await Client.create({
@@ -37,8 +105,7 @@ const seedData = async () => {
       longitude: 35.86742,
     });
 
-    // URUK Rooms
-    await Room.bulkCreate([
+    const urukRooms = await Room.bulkCreate([
       {
         roomNumber: "URUK-1",
         roomType: "classroom",
@@ -122,7 +189,7 @@ const seedData = async () => {
       email: "wisdow@gmail.com",
       password: wisdowPassword,
       phoneNumber: "0791238760",
-      roleId: 2,
+      roleId: clientRole.id,
     });
     
     const wisdowClient = await Client.create({
@@ -133,8 +200,7 @@ const seedData = async () => {
       longitude: 35.8699147,
     });
 
-    // WISDOW Rooms
-    await Room.bulkCreate([
+    const wisdowRooms = await Room.bulkCreate([
       {
         roomNumber: "WISDOW-1",
         roomType: "classroom",
@@ -152,7 +218,7 @@ const seedData = async () => {
       {
         roomNumber: "WISDOW-2",
         roomType: "meeting_room",
-        capacity: 10,
+        capacity: 12,
         basePrice: 10,
         status: "available",
         description: "The best room for your meeting",
@@ -165,28 +231,28 @@ const seedData = async () => {
       },
       {
         roomNumber: "WISDOW-3",
-        roomType: "meeting_room",
-        capacity: 8,
-        basePrice: 10,
-        status: "available",
-        description: "The best room for your meeting",
-        hasWhiteboard: false,
-        hasWifi: true,
-        hasProjector: false,
-        hasTV: true,
-        hasAC: true,
-        clientId: wisdowClient.id,
-      },
-      {
-        roomNumber: "WISDOW-4",
         roomType: "classroom",
-        capacity: 20,
+        capacity: 25,
         basePrice: 15,
         status: "available",
         description: "Good classroom for training, courses or training",
         hasWhiteboard: true,
         hasWifi: true,
         hasProjector: true,
+        hasTV: false,
+        hasAC: true,
+        clientId: wisdowClient.id,
+      },
+      {
+        roomNumber: "WISDOW-4",
+        roomType: "private_room",
+        capacity: 5,
+        basePrice: 8,
+        status: "available",
+        description: "Private quiet room for focused work",
+        hasWhiteboard: false,
+        hasWifi: true,
+        hasProjector: false,
         hasTV: false,
         hasAC: true,
         clientId: wisdowClient.id,
@@ -195,7 +261,7 @@ const seedData = async () => {
     console.log("✅ WISDOW created with 4 rooms\n");
 
     // ============================================
-    // STUDY HOUSE 3: المعجم (Almujam)
+    // STUDY HOUSE 3: المعجم (ALMUJAM)
     // ============================================
     console.log("📍 Creating المعجم study house...");
     const almujamPassword = await bcrypt.hash("Almujam@2026", 10);
@@ -203,27 +269,40 @@ const seedData = async () => {
       username: "المعجم",
       email: "almujam@gmail.com",
       password: almujamPassword,
-      phoneNumber: "0774567820",
-      roleId: 2,
+      phoneNumber: "0786543210",
+      roleId: clientRole.id,
     });
     
     const almujamClient = await Client.create({
       userId: almujamUser.id,
-      openingHours: "10:00:00",
-      closingHours: "22:00:00",
-      latitude: 32.0111471,
-      longitude: 35.8703272,
+      openingHours: "07:00:00",
+      closingHours: "23:00:00",
+      latitude: 32.0145,
+      longitude: 35.8680,
     });
 
-    // Almujam Rooms
-    await Room.bulkCreate([
+    const almujamRooms = await Room.bulkCreate([
       {
         roomNumber: "ALMUJAM-1",
-        roomType: "classroom",
-        capacity: 30,
-        basePrice: 15,
+        roomType: "meeting_room",
+        capacity: 15,
+        basePrice: 10,
         status: "available",
-        description: "Good classroom for training, courses or training",
+        description: "Modern meeting room with all facilities",
+        hasWhiteboard: true,
+        hasWifi: true,
+        hasProjector: true,
+        hasTV: true,
+        hasAC: true,
+        clientId: almujamClient.id,
+      },
+      {
+        roomNumber: "ALMUJAM-2",
+        roomType: "classroom",
+        capacity: 20,
+        basePrice: 12,
+        status: "available",
+        description: "Spacious classroom perfect for workshops",
         hasWhiteboard: true,
         hasWifi: true,
         hasProjector: true,
@@ -232,29 +311,15 @@ const seedData = async () => {
         clientId: almujamClient.id,
       },
       {
-        roomNumber: "ALMUJAM-2",
-        roomType: "meeting_room",
-        capacity: 10,
-        basePrice: 10,
+        roomNumber: "ALMUJAM-3",
+        roomType: "private_room",
+        capacity: 4,
+        basePrice: 8,
         status: "available",
-        description: "The best room for your meeting",
+        description: "Quiet private room for focused work",
         hasWhiteboard: false,
         hasWifi: true,
         hasProjector: false,
-        hasTV: true,
-        hasAC: true,
-        clientId: almujamClient.id,
-      },
-      {
-        roomNumber: "ALMUJAM-3",
-        roomType: "classroom",
-        capacity: 20,
-        basePrice: 15,
-        status: "available",
-        description: "Good classroom for training, courses or training",
-        hasWhiteboard: true,
-        hasWifi: true,
-        hasProjector: true,
         hasTV: false,
         hasAC: true,
         clientId: almujamClient.id,
@@ -271,35 +336,32 @@ const seedData = async () => {
       username: "FIKAR",
       email: "fikar@gmail.com",
       password: fikarPassword,
-      phoneNumber: "0771872984",
-      roleId: 2,
+      phoneNumber: "0779876543",
+      roleId: clientRole.id,
     });
     
     const fikarClient = await Client.create({
       userId: fikarUser.id,
-      openingHours: "08:00:00",
-      closingHours: "00:00:00",
-      latitude: 32.0111613,
-      longitude: 35.871009,
+      openingHours: "09:00:00",
+      closingHours: "22:00:00",
+      latitude: 32.0160,
+      longitude: 35.8690,
     });
 
-    // FIKAR Rooms
-    await Room.bulkCreate([
-      {
-        roomNumber: "FIKAR-1",
-        roomType: "classroom",
-        capacity: 30,
-        basePrice: 15,
-        status: "available",
-        description: "Good classroom for training, courses or training",
-        hasWhiteboard: true,
-        hasWifi: true,
-        hasProjector: true,
-        hasTV: false,
-        hasAC: true,
-        clientId: fikarClient.id,
-      },
-    ]);
+    await Room.create({
+      roomNumber: "FIKAR-1",
+      roomType: "classroom",
+      capacity: 25,
+      basePrice: 12,
+      status: "available",
+      description: "Comfortable classroom with modern amenities",
+      hasWhiteboard: true,
+      hasWifi: true,
+      hasProjector: true,
+      hasTV: false,
+      hasAC: true,
+      clientId: fikarClient.id,
+    });
     console.log("✅ FIKAR created with 1 room\n");
 
     // ============================================
@@ -311,91 +373,114 @@ const seedData = async () => {
       username: "LUMINA",
       email: "lumina@gmail.com",
       password: luminaPassword,
-      phoneNumber: "0781284563",
-      roleId: 2,
+      phoneNumber: "0771234567",
+      roleId: clientRole.id,
     });
     
     const luminaClient = await Client.create({
       userId: luminaUser.id,
-      openingHours: "08:00:00",
-      closingHours: "23:00:00",
-      latitude: 32.0120,
-      longitude: 35.8710,
+      openingHours: "08:30:00",
+      closingHours: "21:00:00",
+      latitude: 32.0140,
+      longitude: 35.8695,
     });
 
-    // LUMINA Rooms
-    await Room.bulkCreate([
-      {
-        roomNumber: "LUMINA-1",
-        roomType: "classroom",
-        capacity: 30,
-        basePrice: 15,
-        status: "available",
-        description: "Good classroom for training, courses or training",
-        hasWhiteboard: true,
-        hasWifi: true,
-        hasProjector: true,
-        hasTV: false,
-        hasAC: true,
-        clientId: luminaClient.id,
-      },
-    ]);
+    await Room.create({
+      roomNumber: "LUMINA-1",
+      roomType: "classroom",
+      capacity: 30,
+      basePrice: 15,
+      status: "available",
+      description: "Good classroom for training, courses or training",
+      hasWhiteboard: true,
+      hasWifi: true,
+      hasProjector: true,
+      hasTV: false,
+      hasAC: true,
+      clientId: luminaClient.id,
+    });
     console.log("✅ LUMINA created with 1 room\n");
 
     // ============================================
-    // CREATE TEST USERS
+    // CREATE PAST BOOKINGS FOR REVIEW TESTING
     // ============================================
-    console.log("📍 Creating test users...");
-    const testUserPassword = await bcrypt.hash("Test@2026", 10);
+    console.log("📍 Creating past bookings for review testing...");
     
-    await User.bulkCreate([
+    await Booking.bulkCreate([
       {
-        username: "Ahmed",
-        email: "ahmed@test.com",
-        password: testUserPassword,
-        phoneNumber: "0781111111",
-        roleId: 1,
+        customerId: ahmed.id,
+        roomId: urukRooms[0].id,
+        date: "2025-12-15",
+        checkInTime: "09:00:00",
+        checkOutTime: "12:00:00",
+        totalPrice: 45,
+        status: "approved",
       },
       {
-        username: "Sara",
-        email: "sara@test.com",
-        password: testUserPassword,
-        phoneNumber: "0782222222",
-        roleId: 1,
+        customerId: ahmed.id,
+        roomId: wisdowRooms[0].id,
+        date: "2025-12-20",
+        checkInTime: "14:00:00",
+        checkOutTime: "17:00:00",
+        totalPrice: 45,
+        status: "approved",
       },
       {
-        username: "Mohammed",
-        email: "mohammed@test.com",
-        password: testUserPassword,
-        phoneNumber: "0783333333",
-        roleId: 1,
+        customerId: sara.id,
+        roomId: almujamRooms[0].id,
+        date: "2025-12-28",
+        checkInTime: "10:00:00",
+        checkOutTime: "13:00:00",
+        totalPrice: 30,
+        status: "approved",
+      },
+      {
+        customerId: sara.id,
+        roomId: urukRooms[0].id,
+        date: "2026-01-03",
+        checkInTime: "08:00:00",
+        checkOutTime: "11:00:00",
+        totalPrice: 45,
+        status: "approved",
       },
     ]);
-    console.log("✅ Created 3 test users\n");
+    console.log("✅ Created 4 past approved bookings\n");
 
     // ============================================
     // SUMMARY
     // ============================================
     console.log("========================================");
-    console.log("🎉 PRESENTATION DATA SEEDED SUCCESSFULLY!");
+    console.log("🎉 COMPLETE DATABASE SEEDED SUCCESSFULLY!");
     console.log("========================================\n");
     
-    console.log("📚 STUDY HOUSES (Client Login):");
+    console.log("📊 DATABASE SUMMARY:");
+    console.log("  • 3 Roles (user, client, admin)");
+    console.log("  • 1 Admin user");
+    console.log("  • 3 Test users");
+    console.log("  • 5 Study Houses (clients)");
+    console.log("  • 14 Rooms total");
+    console.log("  • 4 Past bookings for testing\n");
+
+    console.log("🔐 LOGIN CREDENTIALS:\n");
+    
+    console.log("👨‍💼 ADMIN:");
+    console.log("  Email: admin@ehjez.com");
+    console.log("  Password: admin123\n");
+    
+    console.log("👤 TEST USERS:");
+    console.log("  • ahmed@test.com / Test@2026 (2 bookings)");
+    console.log("  • sara@test.com / Test@2026 (2 bookings)");
+    console.log("  • mohammed@test.com / Test@2026\n");
+    
+    console.log("🏢 STUDY HOUSES (Client Login):");
     console.log("  1. URUK - uruk@gmail.com / Uruk@2026 (5 rooms)");
     console.log("  2. WISDOW - wisdow@gmail.com / Wisdw@2026 (4 rooms)");
     console.log("  3. المعجم - almujam@gmail.com / Almujam@2026 (3 rooms)");
     console.log("  4. FIKAR - fikar@gmail.com / Fikar@2026 (1 room)");
-    console.log("  5. LUMINA - lumina@gmail.com / Lumina@2026 (1 room)");
-    
-    console.log("\n👤 TEST USERS:");
-    console.log("  - ahmed@test.com / Test@2026");
-    console.log("  - sara@test.com / Test@2026");
-    console.log("  - mohammed@test.com / Test@2026");
-    
-    console.log("\n🔐 ADMIN:");
-    console.log("  - admin@ehjez.com / admin123");
-    
-    console.log("\n📊 TOTAL: 5 Study Houses, 14 Rooms, 3 Test Users");
+    console.log("  5. LUMINA - lumina@gmail.com / Lumina@2026 (1 room)\n");
+
+    console.log("✅ Database is ready to use!");
+    console.log("🚀 You can now run your application!\n");
 
     process.exit(0);
   } catch (error) {
@@ -405,4 +490,4 @@ const seedData = async () => {
   }
 };
 
-seedData();
+seedCompleteData();

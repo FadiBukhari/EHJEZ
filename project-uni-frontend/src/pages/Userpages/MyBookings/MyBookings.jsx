@@ -4,6 +4,7 @@ import API from "../../../services/api";
 import { toast } from "react-toastify";
 import { FaStar } from "react-icons/fa";
 import ReviewModal from "../../../components/ReviewModal";
+import { getStudyhouseLogo } from "../../../utils/StudyhouseLogos";
 
 const MyBookings = () => {
   const [rooms, setRooms] = useState([]);
@@ -76,17 +77,32 @@ const MyBookings = () => {
         ) : rooms.length > 0 ? (
           rooms.map((room) => (
             <div className="booking-card" key={room.id}>
-              <img src="/small1.png" alt="Room" className="booked-img-room" />
+              <img 
+                src={getStudyhouseLogo(room.room?.client?.user?.username)} 
+                alt={room.room?.client?.user?.username || "Room"} 
+                className="booked-img-room" 
+              />
               <div className="booking-card-content">
                 <h3 className="booking-room-title">
-                  {room.room?.roomType?.replace(/_/g, " ") || "Study Room"}
+                  {room.room?.roomType?.replace(/_/g, " ") || "Room"}
                 </h3>
                 {room.room?.client?.user?.username && (
                   <p className="study-house-name">
-                    <strong>📍 Study House:</strong>{" "}
-                    {room.room.client.user.username}
+                    <strong>📍</strong> {room.room.client.user.username}
                   </p>
                 )}
+                
+                {/* Room Amenities */}
+                {room.room && (
+                  <div className="room-amenities">
+                    {room.room.hasWifi && <span className="amenity">📶 WiFi</span>}
+                    {room.room.hasAC && <span className="amenity">❄️ AC</span>}
+                    {room.room.hasProjector && <span className="amenity">📽️ Projector</span>}
+                    {room.room.hasWhiteboard && <span className="amenity">📋 Whiteboard</span>}
+                    {room.room.hasTV && <span className="amenity">📺 TV</span>}
+                  </div>
+                )}
+
                 <div className="booking-info-grid">
                   <div className="booking-info">
                     <span className="info-icon">📅</span>
