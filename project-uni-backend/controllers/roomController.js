@@ -15,7 +15,7 @@ exports.createRoom = async (req, res) => {
     }
 
     // Validate roomType
-    const validRoomTypes = ["single", "double", "suite"];
+    const validRoomTypes = ["single", "double", "suite", "classroom", "meeting_room", "private_office", "coworking"];
     if (!validRoomTypes.includes(roomType)) {
       return res.status(400).json({ message: "Invalid room type" });
     }
@@ -88,7 +88,7 @@ exports.updateRoom = async (req, res) => {
       return res.status(400).json({ message: "Base price must be positive" });
     }
     if (req.body.roomType) {
-      const validRoomTypes = ["single", "double", "suite"];
+      const validRoomTypes = ["single", "double", "suite", "classroom", "meeting_room", "private_office", "coworking"];
       if (!validRoomTypes.includes(req.body.roomType)) {
         return res.status(400).json({ message: "Invalid room type" });
       }
@@ -139,6 +139,39 @@ exports.deleteRoom = async (req, res) => {
     res.json({ message: "Room deleted successfully" });
   } catch (err) {
     console.error("Delete room error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getRoomById = async (req, res) => {
+  try {
+    const roomId = req.params.id;
+
+    const room = await Room.findOne({
+      where: { id: roomId },
+      include: [
+        {
+          model: Client,
+          as: "client",
+          attributes: ["openingHours", "closingHours", "latitude", "longitude"],
+          include: [
+            {
+              model: User,
+              as: "user",
+              attributes: ["username", "email"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+
+    res.json(room);
+  } catch (err) {
+    console.error("Get room by ID error:", err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -308,7 +341,7 @@ exports.getRoomAvailability = async (req, res) => {
           [Op.in]: ["pending", "approved"], // Only show active bookings
         },
       },
-      attributes: ["id", "date", "checkInTime", "checkOutTime", "status"],
+      attributes: ["id", "date", "checkInTime", "checkOutTime", "status", "customerId"],
       order: [
         ["date", "ASC"],
         ["checkInTime", "ASC"],

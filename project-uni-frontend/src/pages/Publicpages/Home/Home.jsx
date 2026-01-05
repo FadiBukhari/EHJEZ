@@ -73,16 +73,6 @@ const Home = () => {
             <h3>Instant Booking</h3>
             <p>Book your spot in seconds. No waiting, no hassle. Secure your room with just a few clicks.</p>
           </div>
-          <div className="feature-card">
-            <div className="feature-icon">💬</div>
-            <h3>Direct Chat</h3>
-            <p>Communicate directly with venue owners. Ask questions and get instant responses.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">⭐</div>
-            <h3>Verified Reviews</h3>
-            <p>Read authentic reviews from real customers. Make informed decisions for your needs.</p>
-          </div>
         </div>
       </section>
 

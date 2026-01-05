@@ -148,6 +148,13 @@ exports.createClient = async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
+    // Validate phone number format if provided
+    if (phoneNumber && !/^\d{10}$/.test(phoneNumber)) {
+      return res.status(400).json({ 
+        message: "Phone number must be exactly 10 digits" 
+      });
+    }
+
     // Validate client operating hours and location
     if (
       !openingHours ||
@@ -255,6 +262,13 @@ exports.updateClient = async (req, res) => {
           message: "Username or email is already taken",
         });
       }
+    }
+
+    // Validate phone number format if provided
+    if (phoneNumber !== undefined && phoneNumber && !/^\d{10}$/.test(phoneNumber)) {
+      return res.status(400).json({ 
+        message: "Phone number must be exactly 10 digits" 
+      });
     }
 
     // Prepare user updates

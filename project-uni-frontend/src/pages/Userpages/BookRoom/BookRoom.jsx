@@ -1,22 +1,26 @@
-// pages/BookRoom/BookRoom.jsx
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import "./BookRoom.scss";
 import { toast } from "react-toastify";
 import API from "../../../services/api";
 import { getRoomLogo } from "../../../utils/StudyhouseLogos";
+import useAuthStore from "../../../useStore";
 
 const BookRoom = () => {
   const { id: roomId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedStartTime, setSelectedStartTime] = useState(null);
   const [selectedDuration, setSelectedDuration] = useState(1);
   const [availableTimes, setAvailableTimes] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  const { state } = useLocation();
-  const room = useMemo(() => state?.room || {}, [state?.room]);
+  const [room, setRoom] = useState(null);
+  const [loadingRoom, setLoadingRoom] = useState(true);
+
+  // Get current user ID from auth store
+  const currentUserId = user?.id;
 
   // Duration options in hours
   const durationOptions = [1, 2, 3, 4, 5, 6];
@@ -67,15 +71,31 @@ const BookRoom = () => {
   };
 
   // Calculate total price
-  const totalPrice = selectedDuration * (room.basePrice || 0);
+  const totalPrice = selectedDuration * (parseFloat(room?.basePrice) || 0);
+
+  // Fetch room data on mount
+  useEffect(() => {
+    const fetchRoom = async () => {
+      try {
+        setLoadingRoom(true);
+        const response = await API.get(`/rooms/${roomId}`);
+        setRoom(response.data);
+        setLoadingRoom(false);
+      } catch (error) {
+        console.error("Error fetching room:", error);
+        toast.error("Failed to load room information");
+        navigate("/booking");
+      }
+    };
+    
+    if (roomId) {
+      fetchRoom();
+    }
+  }, [roomId, navigate]);
 
   // Fetch booked times for the selected date
   useEffect(() => {
-    if (!room || !room.id) {
-      toast.error("Room information not available");
-      navigate("/booking");
-      return;
-    }
+    if (!room) return;
 
     const fetchBookedTimes = async () => {
       try {
@@ -89,10 +109,7 @@ const BookRoom = () => {
 
         const dayBookings = bookingsData.filter((booking) => {
           const bookingDate = booking.date.split("T")[0];
-          return (
-            bookingDate === dateString &&
-            (booking.status === "pending" || booking.status === "approved")
-          );
+          return bookingDate === dateString;
         });
 
         setBookedSlots(dayBookings);
@@ -103,15 +120,16 @@ const BookRoom = () => {
       }
     };
 
-    if (roomId && room.id) {
+    if (roomId && room) {
       fetchBookedTimes();
     }
-  }, [roomId, selectedDate, room, navigate, refreshKey]);
+  }, [roomId, selectedDate, room, refreshKey]);
 
   // Generate available time slots based on client's hours
   useEffect(() => {
-    if (room.client && room.client.openingHours && room.client.closingHours) {
-      const openTime = room.client.openingHours;
+    if (!room || !room.client || !room.client.openingHours || !room.client.closingHours) return;
+    
+    const openTime = room.client.openingHours;
       const closeTime = room.client.closingHours;
 
       const openHour = parseInt(openTime.split(":")[0]);
@@ -139,7 +157,6 @@ const BookRoom = () => {
       }
 
       setAvailableTimes(slots);
-    }
   }, [room]);
 
   // Reset start time when date changes
@@ -150,6 +167,33 @@ const BookRoom = () => {
   // Check if a time slot is booked
   const isTimeBooked = (time) => {
     return bookedSlots.some((booking) => {
+      // Only show as "booked" if it's approved
+      if (booking.status !== "approved") return false;
+      
+      const bookingStart = booking.checkInTime?.slice(0, 5);
+      const bookingEnd = booking.checkOutTime?.slice(0, 5);
+      const currentTime = time.slice(0, 5);
+      return currentTime >= bookingStart && currentTime < bookingEnd;
+    });
+  };
+
+  // Check if a time slot has pending booking from current user
+  const isTimeMyPending = (time) => {
+    return bookedSlots.some((booking) => {
+      if (booking.status !== "pending" || booking.customerId !== currentUserId) return false;
+      
+      const bookingStart = booking.checkInTime?.slice(0, 5);
+      const bookingEnd = booking.checkOutTime?.slice(0, 5);
+      const currentTime = time.slice(0, 5);
+      return currentTime >= bookingStart && currentTime < bookingEnd;
+    });
+  };
+
+  // Check if a time slot has pending booking from other users
+  const isTimeOthersPending = (time) => {
+    return bookedSlots.some((booking) => {
+      if (booking.status !== "pending" || booking.customerId === currentUserId) return false;
+      
       const bookingStart = booking.checkInTime?.slice(0, 5);
       const bookingEnd = booking.checkOutTime?.slice(0, 5);
       const currentTime = time.slice(0, 5);
@@ -184,11 +228,12 @@ const BookRoom = () => {
       }
     }
     
-    // Check if any hour in the range is booked
+    // Check if any hour in the range is booked (approved bookings only)
     for (let h = startHour; h < endHour; h++) {
       const normalizedHour = h % 24;
       const timeSlot = `${normalizedHour.toString().padStart(2, "0")}:00`;
-      if (isTimeBooked(timeSlot)) return false;
+      // Block if approved or any pending booking exists
+      if (isTimeBooked(timeSlot) || isTimeMyPending(timeSlot) || isTimeOthersPending(timeSlot)) return false;
     }
     
     return true;
@@ -237,8 +282,22 @@ const BookRoom = () => {
     }
   };
 
-  if (!room || !room.id) {
-    return null;
+  // Show loading state while fetching room data
+  if (loadingRoom) {
+    return (
+      <div className="bookroom-page">
+        <div className="loading">Loading room information...</div>
+      </div>
+    );
+  }
+
+  // Show error if room not found
+  if (!room) {
+    return (
+      <div className="bookroom-page">
+        <div className="error">Room not found</div>
+      </div>
+    );
   }
 
   return (
@@ -268,7 +327,7 @@ const BookRoom = () => {
         <div className="room-info-text">
           <h3>{room.client?.user?.username || "Study House"}</h3>
           <p className="room-type">{room.roomType} • {room.capacity} people</p>
-          <p className="room-price">${room.basePrice}<span>/hour</span></p>
+          <p className="room-price">${parseFloat(room.basePrice) || 0}<span>/hour</span></p>
         </div>
       </div>
 
@@ -312,19 +371,23 @@ const BookRoom = () => {
           {availableTimes.length > 0 ? (
             availableTimes.map((time) => {
               const booked = isTimeBooked(time);
+              const myPending = isTimeMyPending(time);
+              const othersPending = isTimeOthersPending(time);
               const past = isTimePast(time);
-              const disabled = booked || past;
+              const disabled = booked || myPending || othersPending || past;
               
               return (
                 <button
                   key={time}
                   type="button"
-                  className={`time-btn ${selectedStartTime === time ? "selected" : ""} ${booked ? "booked" : ""} ${past ? "past" : ""}`}
+                  className={`time-btn ${selectedStartTime === time ? "selected" : ""} ${booked ? "booked" : ""} ${myPending ? "my-pending" : ""} ${othersPending ? "others-pending" : ""} ${past ? "past" : ""}`}
                   onClick={() => !disabled && setSelectedStartTime(time)}
                   disabled={disabled}
                 >
                   {time}
                   {booked && <span className="booked-label">Booked</span>}
+                  {myPending && !booked && <span className="pending-label">Waiting Approval</span>}
+                  {othersPending && !booked && !myPending && <span className="pending-label">Pending</span>}
                 </button>
               );
             })
@@ -352,7 +415,7 @@ const BookRoom = () => {
                 disabled={!valid}
               >
                 {duration} {duration === 1 ? "Hour" : "Hours"}
-                <span className="duration-price">${(duration * room.basePrice).toFixed(0)}</span>
+                <span className="duration-price">${(duration * parseFloat(room.basePrice)).toFixed(0)}</span>
               </button>
             );
           })}

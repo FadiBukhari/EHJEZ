@@ -6,7 +6,6 @@ import "./AddRoom.scss";
 const AddRoom = () => {
   const navigate = useNavigate();
   const [room, setRoom] = useState({
-    roomNumber: "",
     roomType: "single",
     capacity: "",
     basePrice: "",
@@ -48,73 +47,87 @@ const AddRoom = () => {
         >
           ← Back
         </button>
-        <h2 className="text-xl font-bold">Add New Room</h2>
+        <h2>Add New Room</h2>
       </div>
-      <input
-        name="roomNumber"
-        placeholder="Room Number"
-        value={room.roomNumber}
-        onChange={handleChange}
-        required
-        className="input"
-      />
 
-      <select
-        name="roomType"
-        value={room.roomType}
-        onChange={handleChange}
-        className="input"
-      >
-        <option value="single">Single</option>
-        <option value="double">Double</option>
-        <option value="suite">Suite</option>
-        <option value="classroom">Classroom</option>
-        <option value="meeting_room">Meeting Room</option>
-        <option value="private_office">Private Office</option>
-        <option value="coworking">Coworking</option>
-      </select>
+      <div className="form-group">
+        <label htmlFor="roomType">Room Type *</label>
+        <select
+          id="roomType"
+          name="roomType"
+          value={room.roomType}
+          onChange={handleChange}
+          className="input"
+        >
+          <option value="single">Single</option>
+          <option value="double">Double</option>
+          <option value="suite">Suite</option>
+          <option value="classroom">Classroom</option>
+          <option value="meeting_room">Meeting Room</option>
+          <option value="private_office">Private Office</option>
+          <option value="coworking">Coworking</option>
+        </select>
+      </div>
 
-      <input
-        name="capacity"
-        type="number"
-        placeholder="Capacity"
-        min="1"
-        value={room.capacity}
-        onChange={handleChange}
-        required
-        className="input"
-      />
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="capacity">Capacity (People) *</label>
+          <input
+            id="capacity"
+            name="capacity"
+            type="number"
+            placeholder="e.g., 10"
+            min="1"
+            value={room.capacity}
+            onChange={handleChange}
+            required
+            className="input"
+          />
+        </div>
 
-      <input
-        name="basePrice"
-        type="number"
-        step="0.01"
-        min="0"
-        placeholder="Base Price"
-        value={room.basePrice}
-        onChange={handleChange}
-        required
-        className="input"
-      />
+        <div className="form-group">
+          <label htmlFor="basePrice">Base Price ($/hour) *</label>
+          <input
+            id="basePrice"
+            name="basePrice"
+            type="number"
+            step="1"
+            min="0"
+            placeholder="e.g., 25"
+            value={room.basePrice}
+            onChange={handleChange}
+            required
+            className="input"
+          />
+        </div>
+      </div>
 
-      <select
-        name="status"
-        value={room.status}
-        onChange={handleChange}
-        className="input"
-      >
-        <option value="available">Available</option>
-        <option value="maintenance">Maintenance</option>
-        <option value="inactive">Inactive</option>
-      </select>
+      <div className="form-group">
+        <label htmlFor="status">Status</label>
+        <select
+          id="status"
+          name="status"
+          value={room.status}
+          onChange={handleChange}
+          className="input"
+        >
+          <option value="available">Available</option>
+          <option value="maintenance">Maintenance</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
 
-      <textarea
-        name="description"
-        placeholder="Description"
-        value={room.description}
-        onChange={handleChange}
-        className="input"
-      />
+      <div className="form-group">
+        <label htmlFor="description">Description</label>
+        <textarea
+          id="description"
+          name="description"
+          placeholder="Describe the room features, location, or any special notes..."
+          value={room.description}
+          onChange={handleChange}
+          className="input"
+        />
+      </div>
 
       <div className="features-section">
         <h3>Room Features</h3>
@@ -126,7 +139,7 @@ const AddRoom = () => {
               checked={room.hasWhiteboard}
               onChange={handleChange}
             />
-            <span>Whiteboard</span>
+            <span>📋 Whiteboard</span>
           </label>
           <label className="feature-checkbox">
             <input
@@ -135,7 +148,7 @@ const AddRoom = () => {
               checked={room.hasWifi}
               onChange={handleChange}
             />
-            <span>Wi-Fi</span>
+            <span>📶 Wi-Fi</span>
           </label>
           <label className="feature-checkbox">
             <input
@@ -144,7 +157,7 @@ const AddRoom = () => {
               checked={room.hasProjector}
               onChange={handleChange}
             />
-            <span>Projector</span>
+            <span>📽️ Projector</span>
           </label>
           <label className="feature-checkbox">
             <input
@@ -153,7 +166,7 @@ const AddRoom = () => {
               checked={room.hasTV}
               onChange={handleChange}
             />
-            <span>TV</span>
+            <span>📺 TV</span>
           </label>
           <label className="feature-checkbox">
             <input
@@ -162,12 +175,12 @@ const AddRoom = () => {
               checked={room.hasAC}
               onChange={handleChange}
             />
-            <span>AC</span>
+            <span>❄️ AC</span>
           </label>
         </div>
       </div>
 
-      <button className="btn-primary w-full">Create Room</button>
+      <button type="submit" className="btn-primary">Create Room</button>
     </form>
   );
 };

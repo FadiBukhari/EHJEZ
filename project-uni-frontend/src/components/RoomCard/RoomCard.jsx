@@ -77,7 +77,7 @@ const RoomCard = ({ room }) => {
           )}
           <div className="room-price">
             <span className="price-label">Price:</span>
-            <span className="price-value">${room.basePrice}</span>
+            <span className="price-value">${parseFloat(room.basePrice) || 0}</span>
             <span className="price-period">/hour</span>
           </div>
         </div>

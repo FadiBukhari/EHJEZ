@@ -586,3 +586,12 @@ WISDOW	wisdow@gmail.com	Wisdw@2026	4 rooms
 المعجم	almujam@gmail.com	Almujam@2026	3 rooms
 FIKAR	fikar@gmail.com	Fikar@2026	1 room
 LUMINA	lumina@gmail.com	Lumina@2026	1 room
+
+Name	Email	Password
+Ahmed	ahmed@test.com	Test@2026
+Sara	sara@test.com	Test@2026
+Mohammed	mohammed@test.com	Test@2026
+
+
+Email: admin@ehjez.com
+Password: admin123

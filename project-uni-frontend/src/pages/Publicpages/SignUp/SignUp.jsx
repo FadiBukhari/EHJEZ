@@ -25,6 +25,9 @@ const SignUp = () => {
       if (form.password.length < 6) {
         return toast.error("Password must be at least 6 characters");
       }
+      if (!/^\d{10}$/.test(form.phoneNumber)) {
+        return toast.error("Phone number must be exactly 10 digits");
+      }
       // All public registrations are users only
       await API.post("users/register", { ...form, role: "user" });
       toast.success("Registration successful! Please sign in.");
@@ -85,7 +88,16 @@ const SignUp = () => {
             className="input-form"
             name="phoneNumber"
             value={form.phoneNumber}
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Only allow digits and max length of 10
+              if (/^\d*$/.test(value) && value.length <= 10) {
+                setForm({ ...form, phoneNumber: value });
+              }
+            }}
+            pattern="\d{10}"
+            maxLength="10"
+            title="Phone number must be exactly 10 digits"
             required
           />
 

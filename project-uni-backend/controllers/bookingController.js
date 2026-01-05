@@ -52,7 +52,7 @@ exports.createBooking = async (req, res) => {
     const [outHour, outMin] = checkOutTime.split(":").map(Number);
     const totalMinutes = outHour * 60 + outMin - (inHour * 60 + inMin);
     const calculatedHours = totalMinutes / 60;
-    const expectedPrice = calculatedHours * room.basePrice;
+    const expectedPrice = calculatedHours * parseFloat(room.basePrice);
 
     // Allow $0.01 tolerance for floating point rounding
     if (Math.abs(totalPrice - expectedPrice) > 0.01) {
@@ -68,13 +68,40 @@ exports.createBooking = async (req, res) => {
     // Validate booking time is within client's operating hours
     const client = room.client;
     if (client.openingHours && client.closingHours) {
-      if (
-        checkInTime < client.openingHours ||
-        checkOutTime > client.closingHours
-      ) {
-        return res.status(400).json({
-          message: `Booking times must be within operating hours: ${client.openingHours} - ${client.closingHours}`,
-        });
+      // Normalize times to HH:MM format for comparison
+      const normalizeTime = (time) => {
+        if (!time) return time;
+        return time.slice(0, 5); // Get HH:MM part only
+      };
+      
+      const openingTime = normalizeTime(client.openingHours);
+      const closingTime = normalizeTime(client.closingHours);
+      const checkIn = normalizeTime(checkInTime);
+      const checkOut = normalizeTime(checkOutTime);
+      
+      const opensPastMidnight = closingTime < openingTime;
+      
+      if (opensPastMidnight) {
+        // For times spanning midnight (e.g., 08:00 - 03:00)
+        // Valid times are: >= openingHours OR <= closingHours
+        const checkInValid = checkIn >= openingTime || checkIn <= closingTime;
+        const checkOutValid = checkOut >= openingTime || checkOut <= closingTime;
+        
+        if (!checkInValid || !checkOutValid) {
+          return res.status(400).json({
+            message: `Booking times must be within operating hours: ${openingTime} - ${closingTime}`,
+          });
+        }
+      } else {
+        // For times within same day (e.g., 08:00 - 20:00)
+        if (
+          checkIn < openingTime ||
+          checkOut > closingTime
+        ) {
+          return res.status(400).json({
+            message: `Booking times must be within operating hours: ${openingTime} - ${closingTime}`,
+          });
+        }
       }
     }
 
@@ -83,9 +110,7 @@ exports.createBooking = async (req, res) => {
       where: {
         roomId: id,
         date: date,
-        status: {
-          [Op.in]: ["pending", "approved"], // Only check active bookings
-        },
+        status: "approved", // Only check approved bookings
         [Op.or]: [
           // New booking starts during existing booking
           {
@@ -131,12 +156,21 @@ exports.createBooking = async (req, res) => {
 
 exports.getUserBookings = async (req, res) => {
   try {
+    const { roomType } = req.query;
+    
+    // Build where clause for Room model
+    const roomWhere = {};
+    if (roomType) {
+      roomWhere.roomType = roomType;
+    }
+    
     const bookings = await Booking.findAll({
-      where: { customerId: req.user.userId, status: "approved" },
+      where: { customerId: req.user.userId }, // Show all bookings (pending, approved, declined, cancelled)
       include: [
         {
           model: Room,
           as: "room",
+          where: Object.keys(roomWhere).length > 0 ? roomWhere : undefined,
           include: [
             {
               model: Client,

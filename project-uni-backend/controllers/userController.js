@@ -27,6 +27,13 @@ exports.addUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
+    // Validate phone number format if provided
+    if (phoneNumber && !/^\d{10}$/.test(phoneNumber)) {
+      return res.status(400).json({ 
+        message: "Phone number must be exactly 10 digits" 
+      });
+    }
+
     // SECURITY: Only allow 'user' role through public registration
     // Admin and client accounts must be created by administrators
     if (role && role !== "user") {
@@ -213,10 +220,19 @@ exports.editProfile = async (req, res) => {
       }
     }
 
+    // Validate phone number format if provided
+    if (phoneNumber !== undefined) {
+      if (phoneNumber && !/^\d{10}$/.test(phoneNumber)) {
+        return res.status(400).json({ 
+          message: "Phone number must be exactly 10 digits" 
+        });
+      }
+    }
+
     const updates = {};
     if (username) updates.username = username;
     if (email) updates.email = email;
-    if (phoneNumber) updates.phoneNumber = phoneNumber;
+    if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
 
     if (Object.keys(updates).length > 0) {
       await user.update(updates);

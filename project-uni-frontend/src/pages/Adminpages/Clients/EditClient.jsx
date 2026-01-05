@@ -48,10 +48,20 @@ const EditClient = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    // Handle phone number input separately to restrict to digits only
+    if (name === "phoneNumber") {
+      if (/^\d*$/.test(value) && value.length <= 10) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
     setError("");
   };
 
@@ -79,6 +89,11 @@ const EditClient = () => {
       !formData.longitude
     ) {
       setError("Please fill in all required fields");
+      return;
+    }
+
+    if (!/^\d{10}$/.test(formData.phoneNumber)) {
+      setError("Phone number must be exactly 10 digits");
       return;
     }
 
@@ -173,7 +188,10 @@ const EditClient = () => {
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleChange}
-              placeholder="Enter phone number"
+              placeholder="Enter 10-digit phone number"
+              pattern="\d{10}"
+              maxLength="10"
+              title="Phone number must be exactly 10 digits"
               required
             />
           </div>
@@ -185,6 +203,7 @@ const EditClient = () => {
               </label>
               <input
                 type="time"
+                step="3600"
                 id="openingHours"
                 name="openingHours"
                 value={formData.openingHours}
@@ -199,6 +218,7 @@ const EditClient = () => {
               </label>
               <input
                 type="time"
+                step="3600"
                 id="closingHours"
                 name="closingHours"
                 value={formData.closingHours}

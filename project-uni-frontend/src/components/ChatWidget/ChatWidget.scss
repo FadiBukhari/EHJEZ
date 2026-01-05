@@ -11,13 +11,26 @@
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
-    color: white;
+    color: white !important;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
     transition: all 0.3s ease;
+    padding: 0;
+
+    svg {
+      color: white !important;
+      fill: white !important;
+      width: 24px;
+      height: 24px;
+      display: block;
+      
+      path {
+        fill: white !important;
+      }
+    }
 
     &:hover {
       transform: scale(1.1);
@@ -109,7 +122,7 @@
     .close-btn {
       background: rgba(255, 255, 255, 0.2);
       border: none;
-      color: white;
+      color: white !important;
       width: 32px;
       height: 32px;
       border-radius: 50%;
@@ -118,6 +131,19 @@
       align-items: center;
       justify-content: center;
       transition: background 0.2s;
+      padding: 0;
+
+      svg {
+        color: white !important;
+        fill: white !important;
+        width: 20px;
+        height: 20px;
+        display: block;
+        
+        path {
+          fill: white !important;
+        }
+      }
 
       &:hover {
         background: rgba(255, 255, 255, 0.3);
@@ -285,12 +311,25 @@
       border-radius: 50%;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border: none;
-      color: white;
+      color: white !important;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
+      padding: 0;
+
+      svg {
+        color: white !important;
+        fill: white !important;
+        width: 20px;
+        height: 20px;
+        display: block;
+        
+        path {
+          fill: white !important;
+        }
+      }
 
       &:hover:not(:disabled) {
         transform: scale(1.05);

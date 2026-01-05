@@ -45,7 +45,7 @@ const Payment = () => {
           </div>
           <div className="payment-smaller-details">
             <span>Total cost:</span>
-            <span>{room.basePrice}</span>
+            <span>${parseFloat(room.basePrice) || 0}</span>
           </div>
         </div>
 

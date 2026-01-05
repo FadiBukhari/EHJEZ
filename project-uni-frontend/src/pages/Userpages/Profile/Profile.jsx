@@ -44,6 +44,10 @@ const Profile = () => {
           setIsPhoneEditable(false);
           return;
         }
+        if (!/^\d{10}$/.test(phoneNumber)) {
+          alert("Phone number must be exactly 10 digits");
+          return;
+        }
         updatedData.phoneNumber = phoneNumber;
         break;
       case "username":
@@ -225,9 +229,16 @@ const Profile = () => {
               type="tel"
               value={phoneNumber}
               onChange={(e) => {
-                setPhoneNumber(e.target.value);
+                const value = e.target.value;
+                // Only allow digits and max length of 10
+                if (/^\d*$/.test(value) && value.length <= 10) {
+                  setPhoneNumber(value);
+                }
               }}
               disabled={!isPhoneEditable}
+              pattern="\d{10}"
+              maxLength="10"
+              title="Phone number must be exactly 10 digits"
             />
 
             {isPhoneEditable ? (
@@ -255,6 +266,7 @@ const Profile = () => {
                 <input
                   className="detail"
                   type="time"
+                  step="3600"
                   value={openingHours}
                   onChange={(e) => {
                     setOpeningHours(e.target.value);
@@ -270,6 +282,7 @@ const Profile = () => {
                 <input
                   className="detail"
                   type="time"
+                  step="3600"
                   value={closingHours}
                   onChange={(e) => {
                     setClosingHours(e.target.value);

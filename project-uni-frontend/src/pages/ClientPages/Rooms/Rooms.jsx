@@ -48,6 +48,12 @@ function Rooms() {
               description={room.description}
               price={room.basePrice}
               capacity={room.capacity}
+              status={room.status}
+              hasWhiteboard={room.hasWhiteboard}
+              hasWifi={room.hasWifi}
+              hasProjector={room.hasProjector}
+              hasTV={room.hasTV}
+              hasAC={room.hasAC}
               onDelete={handleRoomDeleted}
             />
           ))

@@ -12,7 +12,10 @@ const Booking = () => {
   const [studyHouseFilter, setStudyHouseFilter] = useState(
     searchParams.get("studyhouse") || "all"
   );
+  const [roomTypeFilter, setRoomTypeFilter] = useState("all");
   const [studyHouses, setStudyHouses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchRooms();
@@ -20,6 +23,8 @@ const Booking = () => {
 
   const fetchRooms = async () => {
     try {
+      setIsLoading(true);
+      setError(null);
       const res = await API.get("/rooms/all");
       setRooms(res.data);
       setFilteredRooms(res.data);
@@ -33,6 +38,9 @@ const Booking = () => {
       setStudyHouses(uniqueHouses.sort());
     } catch (error) {
       console.error("Error fetching rooms:", error);
+      setError("Failed to load rooms. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,6 +51,13 @@ const Booking = () => {
     if (studyHouseFilter !== "all") {
       filtered = filtered.filter(
         (room) => room.client?.user?.username === studyHouseFilter
+      );
+    }
+
+    // Filter by room type
+    if (roomTypeFilter !== "all") {
+      filtered = filtered.filter(
+        (room) => room.roomType === roomTypeFilter
       );
     }
 
@@ -65,7 +80,7 @@ const Booking = () => {
     } else {
       setSearchParams({});
     }
-  }, [rooms, priceFilter, studyHouseFilter, setSearchParams]);
+  }, [rooms, priceFilter, studyHouseFilter, roomTypeFilter, setSearchParams]);
 
   useEffect(() => {
     applyFilters();
@@ -90,14 +105,33 @@ const Booking = () => {
           </div>
 
           <div className="filter-group">
-            <label htmlFor="studyHouseFilter">Study House:</label>
+            <label htmlFor="roomTypeFilter">Room Type:</label>
+            <select
+              id="roomTypeFilter"
+              value={roomTypeFilter}
+              onChange={(e) => setRoomTypeFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Types</option>
+              <option value="single">Single</option>
+              <option value="double">Double</option>
+              <option value="suite">Suite</option>
+              <option value="classroom">Classroom</option>
+              <option value="meeting_room">Meeting Room</option>
+              <option value="private_office">Private Office</option>
+              <option value="coworking">Coworking</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label htmlFor="studyHouseFilter">Venue:</label>
             <select
               id="studyHouseFilter"
               value={studyHouseFilter}
               onChange={(e) => setStudyHouseFilter(e.target.value)}
               className="filter-select"
             >
-              <option value="all">All Study Houses</option>
+              <option value="all">All Venues</option>
               {studyHouses.map((house) => (
                 <option key={house} value={house}>
                   {house}
@@ -116,7 +150,19 @@ const Booking = () => {
       </div>
 
       <div className="booking-container">
-        {filteredRooms.length > 0 ? (
+        {isLoading ? (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Loading rooms...</p>
+          </div>
+        ) : error ? (
+          <div className="error-state">
+            <p>{error}</p>
+            <button onClick={fetchRooms} className="retry-btn">
+              Try Again
+            </button>
+          </div>
+        ) : filteredRooms.length > 0 ? (
           filteredRooms.map((room) => <RoomCard key={room.id} room={room} />)
         ) : (
           <div className="no-rooms">

@@ -22,10 +22,20 @@ const AddClient = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    // Handle phone number input separately to restrict to digits only
+    if (name === "phoneNumber") {
+      if (/^\d*$/.test(value) && value.length <= 10) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
     setError(""); // Clear error on input change
   };
 
@@ -59,6 +69,11 @@ const AddClient = () => {
 
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters");
+      return;
+    }
+
+    if (!/^\d{10}$/.test(formData.phoneNumber)) {
+      setError("Phone number must be exactly 10 digits");
       return;
     }
 
@@ -170,7 +185,10 @@ const AddClient = () => {
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleChange}
-              placeholder="Enter phone number"
+              placeholder="Enter 10-digit phone number"
+              pattern="\d{10}"
+              maxLength="10"
+              title="Phone number must be exactly 10 digits"
               required
             />
           </div>
@@ -182,6 +200,7 @@ const AddClient = () => {
               </label>
               <input
                 type="time"
+                step="3600"
                 id="openingHours"
                 name="openingHours"
                 value={formData.openingHours}
@@ -196,6 +215,7 @@ const AddClient = () => {
               </label>
               <input
                 type="time"
+                step="3600"
                 id="closingHours"
                 name="closingHours"
                 value={formData.closingHours}

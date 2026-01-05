@@ -5,7 +5,20 @@ import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import AlertModal from "../../../components/AlertModal/AlertModal";
 import "./RoomCard.scss";
 
-const RoomCard = ({ id, type, description, price, capacity, onDelete }) => {
+const RoomCard = ({ 
+  id, 
+  type, 
+  description, 
+  price, 
+  capacity, 
+  status,
+  hasWhiteboard,
+  hasWifi,
+  hasProjector,
+  hasTV,
+  hasAC,
+  onDelete 
+}) => {
   const navigate = useNavigate();
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -19,9 +32,7 @@ const RoomCard = ({ id, type, description, price, capacity, onDelete }) => {
   const [bookingErrorMsg, setBookingErrorMsg] = useState("");
 
   const handleEdit = () => {
-    navigate(`/client/rooms/edit/${id}`, {
-      state: { room: { id, type, description, price, capacity } },
-    });
+    navigate(`/client/rooms/edit/${id}`);
   };
 
   const handleDeleteClick = () => {
@@ -69,7 +80,14 @@ const RoomCard = ({ id, type, description, price, capacity, onDelete }) => {
       <div className="roomcard-admin">
         <img src="/small1.png" className="img-roomcard" alt={type} />
         <div className="room-card-details">
-          <h3 className="room-card-type">{type.replace(/_/g, " ")}</h3>
+          <div className="room-header">
+            <h3 className="room-card-type">{type.replace(/_/g, " ")}</h3>
+            <span className={`room-status-badge status-${status}`}>
+              {status === "available" && "✅ Available"}
+              {status === "maintenance" && "🔧 Maintenance"}
+              {status === "inactive" && "⏸️ Inactive"}
+            </span>
+          </div>
           {description && (
             <p className="room-card-description">{description}</p>
           )}
@@ -78,7 +96,7 @@ const RoomCard = ({ id, type, description, price, capacity, onDelete }) => {
               <span className="info-icon">💵</span>
               <div className="info-content">
                 <span className="info-label">Price</span>
-                <span className="info-value">${price}/hour</span>
+                <span className="info-value">${parseFloat(price) || 0}/hour</span>
               </div>
             </div>
             <div className="info-divider">•</div>
@@ -91,6 +109,35 @@ const RoomCard = ({ id, type, description, price, capacity, onDelete }) => {
                 </span>
               </div>
             </div>
+          </div>
+          
+          {/* Room Features */}
+          <div className="room-features">
+            {hasWifi && (
+              <span className="feature-badge" title="WiFi Available">
+                📶 WiFi
+              </span>
+            )}
+            {hasTV && (
+              <span className="feature-badge" title="TV Available">
+                📺 TV
+              </span>
+            )}
+            {hasProjector && (
+              <span className="feature-badge" title="Projector Available">
+                📽️ Projector
+              </span>
+            )}
+            {hasWhiteboard && (
+              <span className="feature-badge" title="Whiteboard Available">
+                📋 Whiteboard
+              </span>
+            )}
+            {hasAC && (
+              <span className="feature-badge" title="Air Conditioning">
+                ❄️ AC
+              </span>
+            )}
           </div>
         </div>
         <div className="room-card-actions">

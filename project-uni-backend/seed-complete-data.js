@@ -10,7 +10,7 @@
  */
 
 require("dotenv").config();
-const { sequelize, Role, User, Client, Room, Booking, Review } = require("./models");
+const { sequelize, Role, User, Client, Room, Booking, Review, Notification } = require("./models");
 const bcrypt = require("bcrypt");
 
 const seedCompleteData = async () => {
@@ -33,9 +33,9 @@ const seedCompleteData = async () => {
     // ============================================
     console.log("📍 Creating roles...");
     const [userRole, clientRole, adminRole] = await Role.bulkCreate([
-      { id: 1, roleName: "user" },
-      { id: 2, roleName: "client" },
-      { id: 3, roleName: "admin" },
+      { id: 1, name: "user" },
+      { id: 2, name: "client" },
+      { id: 3, name: "admin" },
     ]);
     console.log("✅ Created 3 roles\n");
 
@@ -245,7 +245,7 @@ const seedCompleteData = async () => {
       },
       {
         roomNumber: "WISDOW-4",
-        roomType: "private_room",
+        roomType: "private_office",
         capacity: 5,
         basePrice: 8,
         status: "available",
@@ -312,7 +312,7 @@ const seedCompleteData = async () => {
       },
       {
         roomNumber: "ALMUJAM-3",
-        roomType: "private_room",
+        roomType: "private_office",
         capacity: 4,
         basePrice: 8,
         status: "available",
@@ -447,6 +447,92 @@ const seedCompleteData = async () => {
     console.log("✅ Created 4 past approved bookings\n");
 
     // ============================================
+    // CREATE REVIEWS
+    // ============================================
+    console.log("📍 Creating reviews...");
+    
+    await Review.bulkCreate([
+      {
+        userId: ahmed.id,
+        clientId: urukClient.id,
+        bookingId: 1,
+        rating: 5,
+        comment: "Excellent study space! Very clean and well-equipped.",
+      },
+      {
+        userId: ahmed.id,
+        clientId: wisdowClient.id,
+        bookingId: 2,
+        rating: 4,
+        comment: "Great facilities, comfortable environment for studying.",
+      },
+      {
+        userId: sara.id,
+        clientId: almujamClient.id,
+        bookingId: 3,
+        rating: 5,
+        comment: "Perfect for our group meeting, highly recommended!",
+      },
+      {
+        userId: sara.id,
+        clientId: urukClient.id,
+        bookingId: 4,
+        rating: 4,
+        comment: "Good room with all necessary amenities.",
+      },
+    ]);
+    console.log("✅ Created 4 reviews\n");
+
+    // ============================================
+    // CREATE NOTIFICATIONS
+    // ============================================
+    console.log("📍 Creating sample notifications...");
+    
+    await Notification.bulkCreate([
+      {
+        senderId: urukUser.id,
+        receiverId: ahmed.id,
+        message: "Your booking has been approved!",
+        readAt: new Date("2025-12-14T10:00:00"),
+        createdAt: new Date("2025-12-14T10:00:00"),
+        updatedAt: new Date("2025-12-14T10:00:00"),
+      },
+      {
+        senderId: wisdowUser.id,
+        receiverId: ahmed.id,
+        message: "Your booking has been approved!",
+        readAt: new Date("2025-12-19T10:00:00"),
+        createdAt: new Date("2025-12-19T10:00:00"),
+        updatedAt: new Date("2025-12-19T10:00:00"),
+      },
+      {
+        senderId: almujamUser.id,
+        receiverId: sara.id,
+        message: "Your booking has been approved!",
+        readAt: new Date("2025-12-27T10:00:00"),
+        createdAt: new Date("2025-12-27T10:00:00"),
+        updatedAt: new Date("2025-12-27T10:00:00"),
+      },
+      {
+        senderId: urukUser.id,
+        receiverId: sara.id,
+        message: "Your booking has been approved!",
+        readAt: null, // unread
+        createdAt: new Date("2026-01-02T10:00:00"),
+        updatedAt: new Date("2026-01-02T10:00:00"),
+      },
+      {
+        senderId: ahmed.id,
+        receiverId: urukUser.id,
+        message: "Thank you for the excellent service!",
+        readAt: null, // unread
+        createdAt: new Date("2025-12-15T14:00:00"),
+        updatedAt: new Date("2025-12-15T14:00:00"),
+      },
+    ]);
+    console.log("✅ Created 5 notifications\n");
+
+    // ============================================
     // SUMMARY
     // ============================================
     console.log("========================================");
@@ -459,7 +545,9 @@ const seedCompleteData = async () => {
     console.log("  • 3 Test users");
     console.log("  • 5 Study Houses (clients)");
     console.log("  • 14 Rooms total");
-    console.log("  • 4 Past bookings for testing\n");
+    console.log("  • 4 Past bookings for testing");
+    console.log("  • 4 Reviews");
+    console.log("  • 5 Notifications\n");
 
     console.log("🔐 LOGIN CREDENTIALS:\n");
     

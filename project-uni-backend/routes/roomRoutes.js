@@ -3,6 +3,7 @@ const {
   createRoom,
   updateRoom,
   deleteRoom,
+  getRoomById,
   getOwnedRooms,
   getAllRooms,
   getBookedRooms,
@@ -15,21 +16,21 @@ const authorizeClient = require("../middlewares/authorizeClient");
 
 const router = express.Router();
 
-router.post("/", authenticateToken, authorizeClient, createRoom);
-router.put("/:id", authenticateToken, authorizeClient, updateRoom);
-router.delete("/:id", authenticateToken, authorizeClient, deleteRoom);
+// Static routes MUST come first (before parameterized routes)
+router.get("/all", authenticateToken, getAllRooms);
 router.get("/owned", authenticateToken, authorizeClient, getOwnedRooms);
 router.get("/bookedowned", authenticateToken, authorizeClient, getBookedRooms);
-router.get(
-  "/:id/bookings",
-  authenticateToken,
-  authorizeClient,
-  getRoomBookings
-);
 
-// Public endpoint for users to see room availability (requires auth but not client role)
+// Parameterized routes with additional segments
 router.get("/:id/availability", authenticateToken, getRoomAvailability);
+router.get("/:id/bookings", authenticateToken, authorizeClient, getRoomBookings);
 
-router.get("/all", authenticateToken, getAllRooms);
+// Single parameterized routes (catch-all, must be last)
+router.get("/:id", authenticateToken, getRoomById);
+router.put("/:id", authenticateToken, authorizeClient, updateRoom);
+router.delete("/:id", authenticateToken, authorizeClient, deleteRoom);
+
+// Root path operations
+router.post("/", authenticateToken, authorizeClient, createRoom);
 
 module.exports = router;
