@@ -99,8 +99,8 @@ const seedCompleteData = async () => {
     
     const urukClient = await Client.create({
       userId: urukUser.id,
-      openingHours: "00:00:00",
-      closingHours: "23:59:00",
+      openingHours: "06:00:00",
+      closingHours: "23:00:00",
       latitude: 32.0155065,
       longitude: 35.86742,
     });
@@ -195,7 +195,7 @@ const seedCompleteData = async () => {
     const wisdowClient = await Client.create({
       userId: wisdowUser.id,
       openingHours: "08:00:00",
-      closingHours: "03:00:00",
+      closingHours: "22:00:00",
       latitude: 32.0112478,
       longitude: 35.8699147,
     });
@@ -351,7 +351,7 @@ const seedCompleteData = async () => {
     
     const luminaClient = await Client.create({
       userId: luminaUser.id,
-      openingHours: "08:30:00",
+      openingHours: "08:00:00",
       closingHours: "21:00:00",
       latitude: 32.0140,
       longitude: 35.8695,
