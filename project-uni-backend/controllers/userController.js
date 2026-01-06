@@ -14,6 +14,9 @@ exports.addUser = async (req, res) => {
         .json({ message: "Username, password, and email are required" });
     }
 
+    // Normalize email to lowercase for case-insensitive comparison
+    const normalizedEmail = email.toLowerCase().trim();
+
     // Validate password strength
     if (password.length < 6) {
       return res
@@ -23,7 +26,7 @@ exports.addUser = async (req, res) => {
 
     // Validate email format (basic check)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(normalizedEmail)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
@@ -44,7 +47,7 @@ exports.addUser = async (req, res) => {
     }
 
     const exists = await User.findOne({
-      where: { [Op.or]: [{ email }, { username }] },
+      where: { [Op.or]: [{ email: normalizedEmail }, { username }] },
     });
     if (exists) {
       return res
@@ -57,7 +60,7 @@ exports.addUser = async (req, res) => {
     await User.create({
       username,
       password: hashed,
-      email,
+      email: normalizedEmail,
       phoneNumber,
       roleId: 1, // 'user' role
     });
@@ -72,8 +75,11 @@ exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Normalize email to lowercase for case-insensitive comparison
+    const normalizedEmail = email.toLowerCase().trim();
+
     const user = await User.findOne({
-      where: { email },
+      where: { email: normalizedEmail },
       include: [{ model: Role, as: "role", attributes: ["name"] }],
     });
     if (!user) return res.status(404).json({ message: "Invalid credentials" });

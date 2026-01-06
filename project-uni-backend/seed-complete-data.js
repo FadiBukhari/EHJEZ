@@ -243,22 +243,8 @@ const seedCompleteData = async () => {
         hasAC: true,
         clientId: wisdowClient.id,
       },
-      {
-        roomNumber: "WISDOW-4",
-        roomType: "private_office",
-        capacity: 5,
-        basePrice: 8,
-        status: "available",
-        description: "Private quiet room for focused work",
-        hasWhiteboard: false,
-        hasWifi: true,
-        hasProjector: false,
-        hasTV: false,
-        hasAC: true,
-        clientId: wisdowClient.id,
-      },
     ]);
-    console.log("✅ WISDOW created with 4 rooms\n");
+    console.log("✅ WISDOW created with 3 rooms\n");
 
     // ============================================
     // STUDY HOUSE 3: المعجم (ALMUJAM)
@@ -310,22 +296,8 @@ const seedCompleteData = async () => {
         hasAC: true,
         clientId: almujamClient.id,
       },
-      {
-        roomNumber: "ALMUJAM-3",
-        roomType: "private_office",
-        capacity: 4,
-        basePrice: 8,
-        status: "available",
-        description: "Quiet private room for focused work",
-        hasWhiteboard: false,
-        hasWifi: true,
-        hasProjector: false,
-        hasTV: false,
-        hasAC: true,
-        clientId: almujamClient.id,
-      },
     ]);
-    console.log("✅ المعجم created with 3 rooms\n");
+    console.log("✅ المعجم created with 2 rooms\n");
 
     // ============================================
     // STUDY HOUSE 4: FIKAR
@@ -544,7 +516,7 @@ const seedCompleteData = async () => {
     console.log("  • 1 Admin user");
     console.log("  • 3 Test users");
     console.log("  • 5 Study Houses (clients)");
-    console.log("  • 14 Rooms total");
+    console.log("  • 12 Rooms total");
     console.log("  • 4 Past bookings for testing");
     console.log("  • 4 Reviews");
     console.log("  • 5 Notifications\n");
@@ -562,8 +534,8 @@ const seedCompleteData = async () => {
     
     console.log("🏢 STUDY HOUSES (Client Login):");
     console.log("  1. URUK - uruk@gmail.com / Uruk@2026 (5 rooms)");
-    console.log("  2. WISDOW - wisdow@gmail.com / Wisdw@2026 (4 rooms)");
-    console.log("  3. المعجم - almujam@gmail.com / Almujam@2026 (3 rooms)");
+    console.log("  2. WISDOW - wisdow@gmail.com / Wisdw@2026 (3 rooms)");
+    console.log("  3. المعجم - almujam@gmail.com / Almujam@2026 (2 rooms)");
     console.log("  4. FIKAR - fikar@gmail.com / Fikar@2026 (1 room)");
     console.log("  5. LUMINA - lumina@gmail.com / Lumina@2026 (1 room)\n");
 

@@ -6,7 +6,8 @@ import "./AddRoom.scss";
 const AddRoom = () => {
   const navigate = useNavigate();
   const [room, setRoom] = useState({
-    roomType: "single",
+    roomNumber: "",
+    roomType: "meeting_room",
     capacity: "",
     basePrice: "",
     status: "available",
@@ -51,6 +52,20 @@ const AddRoom = () => {
       </div>
 
       <div className="form-group">
+        <label htmlFor="roomNumber">Room Number *</label>
+        <input
+          id="roomNumber"
+          name="roomNumber"
+          type="text"
+          placeholder="e.g., 101, A-202, Room-5"
+          value={room.roomNumber}
+          onChange={handleChange}
+          required
+          className="input"
+        />
+      </div>
+
+      <div className="form-group">
         <label htmlFor="roomType">Room Type *</label>
         <select
           id="roomType"
@@ -59,13 +74,8 @@ const AddRoom = () => {
           onChange={handleChange}
           className="input"
         >
-          <option value="single">Single</option>
-          <option value="double">Double</option>
-          <option value="suite">Suite</option>
-          <option value="classroom">Classroom</option>
           <option value="meeting_room">Meeting Room</option>
-          <option value="private_office">Private Office</option>
-          <option value="coworking">Coworking</option>
+          <option value="classroom">Classroom</option>
         </select>
       </div>
 

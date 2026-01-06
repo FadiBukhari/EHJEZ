@@ -135,6 +135,9 @@ exports.createClient = async (req, res) => {
       });
     }
 
+    // Normalize email to lowercase for case-insensitive comparison
+    const normalizedEmail = email.toLowerCase().trim();
+
     // Validate password strength
     if (password.length < 6) {
       return res.status(400).json({
@@ -144,7 +147,7 @@ exports.createClient = async (req, res) => {
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(normalizedEmail)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
@@ -170,7 +173,7 @@ exports.createClient = async (req, res) => {
 
     // Check if user already exists
     const exists = await User.findOne({
-      where: { [Op.or]: [{ email }, { username }] },
+      where: { [Op.or]: [{ email: normalizedEmail }, { username }] },
     });
 
     if (exists) {
@@ -189,7 +192,7 @@ exports.createClient = async (req, res) => {
     const user = await User.create({
       username,
       password: hashed,
-      email,
+      email: normalizedEmail,
       phoneNumber,
       roleId: clientRole.id,
     });

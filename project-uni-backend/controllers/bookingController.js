@@ -226,14 +226,20 @@ exports.updateBookingStatus = async (req, res) => {
 exports.deleteBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
-    const clientId = req.user.userId;
+    const userId = req.user.userId;
+
+    // Get the client profile for this user
+    const client = await Client.findOne({ where: { userId } });
+    if (!client) {
+      return res.status(403).json({ message: "Client profile not found" });
+    }
 
     const booking = await Booking.findByPk(bookingId, {
       include: [
         {
           model: Room,
           as: "room",
-          attributes: ["id", "ownerId", "roomNumber"],
+          attributes: ["id", "clientId", "roomNumber"],
         },
       ],
     });
@@ -243,7 +249,7 @@ exports.deleteBooking = async (req, res) => {
     }
 
     // Verify the booking belongs to a room owned by this client
-    if (booking.room.ownerId !== clientId) {
+    if (booking.room.clientId !== client.id) {
       return res.status(403).json({
         message:
           "Unauthorized: You can only delete bookings for your own rooms",

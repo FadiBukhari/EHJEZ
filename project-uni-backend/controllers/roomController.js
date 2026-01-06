@@ -15,7 +15,7 @@ exports.createRoom = async (req, res) => {
     }
 
     // Validate roomType
-    const validRoomTypes = ["single", "double", "suite", "classroom", "meeting_room", "private_office", "coworking"];
+    const validRoomTypes = ["meeting_room", "classroom"];
     if (!validRoomTypes.includes(roomType)) {
       return res.status(400).json({ message: "Invalid room type" });
     }
@@ -88,7 +88,7 @@ exports.updateRoom = async (req, res) => {
       return res.status(400).json({ message: "Base price must be positive" });
     }
     if (req.body.roomType) {
-      const validRoomTypes = ["single", "double", "suite", "classroom", "meeting_room", "private_office", "coworking"];
+      const validRoomTypes = ["meeting_room", "classroom"];
       if (!validRoomTypes.includes(req.body.roomType)) {
         return res.status(400).json({ message: "Invalid room type" });
       }

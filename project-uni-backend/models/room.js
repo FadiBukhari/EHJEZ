@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       roomNumber: { type: DataTypes.STRING, allowNull: false, unique: true },
       roomType: {
-        type: DataTypes.ENUM("single", "double", "suite", "classroom", "meeting_room", "private_office", "coworking"),
+        type: DataTypes.ENUM("meeting_room", "classroom"),
         allowNull: false,
       },
       capacity: { type: DataTypes.INTEGER, allowNull: false },

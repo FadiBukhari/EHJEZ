@@ -169,7 +169,11 @@ const MyBookings = () => {
               <img 
                 src={getStudyhouseLogo(room.room?.client?.user?.username)} 
                 alt={room.room?.client?.user?.username || "Room"} 
-                className="booked-img-room" 
+                className="booked-img-room"
+                onError={(e) => {
+                  e.target.onerror = null; // Prevent infinite loop
+                  e.target.src = "/small1.png"; // Fallback to default image
+                }}
               />
               <div className="booking-card-content">
                 <h3 className="booking-room-title">

@@ -11,7 +11,7 @@ const EditRoom = () => {
   const [price, setPrice] = useState("");
   const [capacity, setCapacity] = useState("");
   const [description, setDescription] = useState("");
-  const [roomType, setRoomType] = useState("single");
+  const [roomType, setRoomType] = useState("meeting_room");
   const [status, setStatus] = useState("available");
   const [features, setFeatures] = useState({
     hasWhiteboard: false,
@@ -30,7 +30,7 @@ const EditRoom = () => {
         setPrice(parseFloat(room.basePrice) || "");
         setCapacity(room.capacity || "");
         setDescription(room.description || "");
-        setRoomType(room.roomType || "single");
+        setRoomType(room.roomType || "meeting_room");
         setStatus(room.status || "available");
         setFeatures({
           hasWhiteboard: room.hasWhiteboard || false,
@@ -132,13 +132,8 @@ const EditRoom = () => {
             value={roomType}
             onChange={(e) => setRoomType(e.target.value)}
           >
-            <option value="single">Single</option>
-            <option value="double">Double</option>
-            <option value="suite">Suite</option>
-            <option value="classroom">Classroom</option>
             <option value="meeting_room">Meeting Room</option>
-            <option value="private_office">Private Office</option>
-            <option value="coworking">Coworking</option>
+            <option value="classroom">Classroom</option>
           </select>
         </div>
         <div className="form-group">
@@ -186,7 +181,7 @@ const EditRoom = () => {
             id="description"
             name="description"
             className="desc-input"
-            required
+            placeholder="Optional: Add room description, features, location, etc."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
